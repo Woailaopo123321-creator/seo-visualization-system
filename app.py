@@ -11,6 +11,10 @@ def index():
 def dashboard():
     return render_template("dashboard.html")
 
+@app.route("/mobile")
+def mobile():
+    return render_template("mobile_control.html")
+
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
