@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "macros.html" import chart_card %}
+{% block title %}自动化工作流{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="eyebrow">自动化</p>
+  <h1>自动化工作流</h1>
+  <p class="lede">SEOWorkflowReAct 的一次示例运行会按研究、差距、评分、验证走完，并留下思考、行动、观察。</p>
+</header>
+<ol class="stage-row">
+  {% for stage in stages %}
+  <li><span>{{ loop.index }}</span>{{ stage.label }}</li>
+  {% endfor %}
+</ol>
+<div id="page-alert" class="page-alert" role="status">正在加载示例运行…</div>
+<p id="workflow-caption" class="hint"></p>
+{{ chart_card("score-chart", "得分构成") }}
+<section class="card">
+  <div class="card-head">
+    <h2>运行摘要</h2>
+    <span class="badge badge-sample" id="run-badge">示例运行</span>
+  </div>
+  <div id="answer"></div>
+</section>
+<div id="steps" class="steps"></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/workflow.js') }}"></script>
+{% endblock %}

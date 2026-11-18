@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}系统概览{% endblock %} · SEO 学习可视化系统</title>
+  <meta name="description" content="{% block description %}SEO 学习可视化：外链评分、知识笔记和自动化工作流。{% endblock %}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% set current = '/dashboard' if active_path == '/' else active_path %}
+<aside class="sidebar">
+  <a class="logo" href="/dashboard">
+    <span class="logo-mark">SEO</span>
+    <span>学习可视化</span>
+  </a>
+  <nav class="side-nav" aria-label="主导航">
+    {% for item in nav_items %}
+    <a href="{{ item.path }}" {% if item.path == current %}class="active" aria-current="page"{% endif %}>{{ item.label }}</a>
+    {% endfor %}
+  </nav>
+</aside>
+<nav class="topnav" aria-label="页面">
+  {% for item in nav_items %}
+  <a href="{{ item.path }}" {% if item.path == current %}class="active" aria-current="page"{% endif %}>{{ item.label }}</a>
+  {% endfor %}
+</nav>
+<main class="main" id="main">
+  <noscript><p class="error">启用 JavaScript 后可以加载图表。页面说明可以直接阅读。</p></noscript>
+  {% block content %}{% endblock %}
+  <footer class="footer">外链外展必须经过人工确认（HITL）。质量阈值 0.70。</footer>
+</main>
+{% block chart_lib %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+{% endblock %}
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

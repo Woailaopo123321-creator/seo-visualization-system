@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "macros.html" import chart_card %}
+{% block title %}四工具流程{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="eyebrow">外链分析</p>
+  <h1>四工具流程</h1>
+  <p class="lede">外链自动化按四个工具阶段推进：研究、差距、评分、验证。</p>
+</header>
+<p class="callout">流程走完也不会自动发信。外展前要人工确认。</p>
+<p id="tools-caption" class="hint"></p>
+<div id="page-alert" class="page-alert" role="status">正在加载数据…</div>
+{{ chart_card("funnel-chart", "差距收窄") }}
+<ol class="pipeline">
+  {% for stage in stages %}
+  <li>
+    <span class="index">{{ loop.index }}</span>
+    <div>
+      <h3>{{ stage.label }}</h3>
+      <p>{{ stage.text }}</p>
+      <p class="mono">{{ stage.tool }}</p>
+      <div class="obs" data-stage="{{ stage.id }}"></div>
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+<section>
+  <h2 class="section-title">外部工具怎么选</h2>
+  <p class="caption">不同任务对应不同的外部工具。下面的建议来自工具选择逻辑，确认后再用。</p>
+  <div id="external-tools" class="link-grid"></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+{% endblock %}

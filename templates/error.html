@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block chart_lib %}{% endblock %}
+{% block content %}
+<header class="page-header">
+  <h1>{{ title }}</h1>
+  <p class="lede">{{ message }}</p>
+  <p><a class="button" href="/dashboard">返回概览</a></p>
+</header>
+{% endblock %}

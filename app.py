@@ -1,23 +1,13 @@
-from flask import Flask, render_template, jsonify
+"""SEO 学习可视化系统入口。
 
-app = Flask(__name__)
-app.config["JSON_AS_ASCII"] = False
+启动：``python app.py``
+生产：``gunicorn -w 2 -b 0.0.0.0:5000 app:app``
+"""
 
-@app.route("/")
-def index():
-    return render_template("dashboard.html")
+from seo_app import create_app
 
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html")
+app = create_app()
 
-@app.route("/mobile")
-def mobile():
-    return render_template("mobile_control.html")
-
-@app.route("/health")
-def health():
-    return jsonify({"status": "ok"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
