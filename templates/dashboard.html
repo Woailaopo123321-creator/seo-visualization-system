@@ -1,52 +1,58 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>系统概览</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#f8fafc;color:#0f172a;display:flex;min-height:100vh}
-.sidebar{width:200px;background:#fff;border-right:1px solid #e2e8f0;padding:16px 0}
-.logo{padding:0 16px 20px;display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;background:#4f46e5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff}
-.sidebar a{display:flex;align-items:center;gap:10px;padding:11px 16px;color:#475569;text-decoration:none;font-size:13px}
-.sidebar a.active{background:#eef2ff;color:#4f46e5;border-right:3px solid #4f46e5}
-.main{flex:1;padding:20px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.stat{background:#fff;border-radius:12px;padding:16px;border:1px solid #e2e8f0}
-.stat .num{font-size:28px;font-weight:700}
-.card{background:#fff;border-radius:12px;padding:16px;border:1px solid #e2e8f0;margin-bottom:16px}
-.kanban{display:flex;gap:10px}
-.col{background:#f8fafc;border-radius:10px;flex:1;padding:10px}
-.col-header{font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;color:#fff;margin-bottom:8px}
-.item{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-size:12px;margin-bottom:8px}
-@media (max-width:768px){.sidebar{display:none}.stats{grid-template-columns:repeat(2,1fr)}.kanban{overflow-x:auto}.col{min-width:150px;flex:none}}
-</style>
-</head>
-<body>
-<div class="sidebar">
-  <div class="logo"><div class="logo-icon">📊</div><div>学习可视化系统</div></div>
-  <a href="/dashboard" class="active">🏠 概览</a>
-  <a href="/mobile">📱 手机控制台</a>
-</div>
-<div class="main">
+{% extends "base.html" %}
+{% from "macros.html" import chart_card %}
+{% block title %}系统概览{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="eyebrow">总览</p>
   <h1>系统概览</h1>
-  <div class="stats">
-    <div class="stat"><div>学习内容总数</div><div class="num">1,248</div></div>
-    <div class="stat"><div>SEO 内容发布</div><div class="num">86</div></div>
-    <div class="stat"><div>智能体任务</div><div class="num">342</div></div>
-    <div class="stat"><div>学习专注度</div><div class="num">72</div></div>
-  </div>
-  <div class="card">
-    <h3>📋 知识看板</h3>
-    <div class="kanban">
-      <div class="col"><div class="col-header" style="background:#3b82f6">待规划</div><div class="item">市场调研</div></div>
-      <div class="col"><div class="col-header" style="background:#22c55e">进行中</div><div class="item">SEO 关键词研究</div></div>
-      <div class="col"><div class="col-header" style="background:#a855f7">待优化</div><div class="item">SEO 优化建议</div></div>
-      <div class="col"><div class="col-header" style="background:#64748b">已完成</div><div class="item">关键词布局</div></div>
-    </div>
-  </div>
+  <p class="lede">从这里进入外链分析、SEO 知识笔记和自动化工作流。图表在加载后显示。</p>
+</header>
+<p class="callout">达到 {{ threshold }} 的目标进入外展候选，发出前仍要人工确认。</p>
+<div id="page-alert" class="page-alert" role="status">正在加载数据…</div>
+<div id="stats" class="stats"></div>
+<div class="layout-2">
+  {{ chart_card("weights-chart", "维度权重") }}
+  {{ chart_card("candidates-chart", "示例候选质量分") }}
 </div>
-</body>
-</html>
+<section class="card">
+  <div class="card-head">
+    <h2>工作流阶段</h2>
+    <span class="badge badge-live">流程</span>
+  </div>
+  <ol class="stage-row">
+    {% for stage in stages %}
+    <li><span>{{ loop.index }}</span>{{ stage.label }}</li>
+    {% endfor %}
+  </ol>
+</section>
+<section>
+  <h2 class="section-title">页面</h2>
+  <div class="link-grid">
+    {% for item in nav_items if item.path != '/dashboard' %}
+    <a class="link-card" href="{{ item.path }}">
+      <strong>{{ item.label }}</strong>
+      <span>{{ item.description }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+<section class="card">
+  <div class="card-head">
+    <h2>知识看板</h2>
+    <span class="badge badge-sample">示例数据</span>
+  </div>
+  <div class="kanban">
+    {% for column in kanban %}
+    <div class="col">
+      <div class="col-header tone-{{ column.tone }}">{{ column.title }}</div>
+      {% for item in column["items"] %}
+      <div class="item">{{ item }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
