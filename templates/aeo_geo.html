@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}SEO · AEO · GEO 三层优化{% endblock %}
+{% block heading %}SEO · AEO · GEO{% endblock %}
+{% block related %}<a href="/seo-deep">深度洞察</a><a href="/seo-workflow">工作流</a><a href="/entity">实体</a><a href="/topical">主题权威</a>{% endblock %}
+{% block head %}
+<style>
+.layer { border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.seo { background: var(--tint-blue); border-left: 4px solid #3b82f6; }
+.aeo { background: var(--tint-green); border-left: 4px solid #10b981; }
+.geo { background: var(--tint-purple); border-left: 4px solid #8b5cf6; }
+.tag { display: inline-block; background: var(--tint-indigo); color: var(--ink-indigo); font-size: 12px; padding: 2px 8px; border-radius: 4px; margin: 2px; }
+.num { font-size: 22px; font-weight: 600; color: var(--accent); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 700px) {
+.grid2 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>三层叠加模型（2026）</h2>
+    <p class="muted" style="margin-bottom:12px;">SEO 是地基，AEO 是答案层，GEO 是引用层。大多数工作同时服务三层。</p>
+    <div class="layer seo">
+      <strong>SEO · 排名层</strong>
+      <div>可爬取、可索引、快速、相关。传统搜索结果。</div>
+      <div style="margin-top:6px;"><span class="tag">技术基础</span><span class="tag">Core Web Vitals</span><span class="tag">内部链接</span></div>
+    </div>
+    <div class="layer aeo">
+      <strong>AEO · 答案层</strong>
+      <div>被选为直接答案：AI Overviews、精选摘要、语音。</div>
+      <div style="margin-top:6px;"><span class="tag">40-60字直接答案</span><span class="tag">可提取段落</span><span class="tag">问题式标题</span></div>
+    </div>
+    <div class="layer geo">
+      <strong>GEO · 引用层</strong>
+      <div>被 ChatGPT / Perplexity / Gemini / AI Mode 引用与提及。</div>
+      <div style="margin-top:6px;"><span class="tag">第三方提及</span><span class="tag">原创数据</span><span class="tag">实体强度</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="num">47-50%</div>
+      <div class="muted">美国搜索中出现 AI Overviews 的比例</div>
+    </div>
+    <div class="card">
+      <div class="num">~38%</div>
+      <div class="muted">AI Overview 引用来自 Top 10 的比例（早期2026）</div>
+    </div>
+    <div class="card">
+      <div class="num">4.8×</div>
+      <div class="muted">强实体知识图谱密度带来的引用提升</div>
+    </div>
+    <div class="card">
+      <div class="num">30-40%</div>
+      <div class="muted">添加统计与引用带来的可见度提升</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>可执行优先动作</h2>
+    <p>• 每页开头 40–60 字直接回答核心问题</p>
+    <p>• 自包含 130–170 字段落 + 至少一个原创数字/数据源</p>
+    <p>• 强化作者与组织实体（sameAs + 真实经历）</p>
+    <p>• 争取“最佳/比较”类第三方页面提及</p>
+    <p>• 监控具体提示词下的 AI 引用（而非仅排名）</p>
+    <p class="muted" style="margin-top:8px;">Google 明确：优化 AI 功能仍是 SEO。优先扎实基础，而非所谓 “AEO/GEO 黑客”。</p>
+  </div>
+</div>
+{% endblock %}

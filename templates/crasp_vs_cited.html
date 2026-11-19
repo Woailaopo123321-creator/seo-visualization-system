@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}CRASP vs CITED · 框架对比{% endblock %}
+{% block heading %}CRASP vs CITED{% endblock %}
+{% block related %}<a href="/crasp">CRASP</a><a href="/passage">段落架构</a><a href="/aeo-geo">AEO/GEO</a><a href="/decay">Decay Monitoring</a><a href="/citation">引用追踪</a>{% endblock %}
+{% block head %}
+<style>
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) {
+.compare { grid-template-columns: 1fr; }
+}
+.fw { padding: 12px; border-radius: 6px; background: var(--surface); }
+.fw h3 { margin: 0 0 8px; }
+.diff { border-left: 3px solid var(--accent); padding-left: 10px; margin: 8px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心定位差异</h2>
+    <div class="compare">
+      <div class="fw">
+        <h3>CRASP</h3>
+        <p class="muted">段落级微观质量框架</p>
+        <p>关注「这一段能不能被直接引用」</p>
+        <p>适用场景：内容撰写、段落审核、passage_audit</p>
+      </div>
+      <div class="fw">
+        <h3>CITED</h3>
+        <p class="muted">页面级执行流程框架</p>
+        <p>关注「整页如何按顺序赢得引用」</p>
+        <p>适用场景：页面优化、发布流程、持续监测</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>字母对照</h2>
+    <table>
+      <tr><th>CRASP</th><th>含义</th><th>CITED</th><th>含义</th></tr>
+      <tr><td><strong>C</strong> Clarity</td><td>无歧义、可单独引用的陈述</td><td><strong>C</strong> Clear Answer First</td><td>每节前 40–60 字给出直接答案</td></tr>
+      <tr><td><strong>R</strong> Relevance</td><td>匹配对话式查询意图</td><td><strong>I</strong> Independent Evidence</td><td>原创数据、引用、具名来源</td></tr>
+      <tr><td><strong>A</strong> Authority</td><td>来源、作者、第三方确认</td><td><strong>T</strong> Typed Structure</td><td>标题与 schema 与可见文本一致</td></tr>
+      <tr><td><strong>S</strong> Structure</td><td>可扫描、可提取格式</td><td><strong>E</strong> Entity Consistency</td><td>全网实体事实保持一致</td></tr>
+      <tr><td><strong>P</strong> Precision</td><td>具体数字、日期、实体</td><td><strong>D</strong> Decay Monitoring</td><td>每月追踪引用并刷新衰减内容</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>关键差异</h2>
+    <div class="diff"><strong>粒度</strong>：CRASP 是段落/句子级；CITED 是页面/流程级。</div>
+    <div class="diff"><strong>时间维度</strong>：CRASP 关注发布时质量；CITED 的 Decay Monitoring 显式包含发布后持续监测。</div>
+    <div class="diff"><strong>证据要求</strong>：CRASP 的 Authority + Precision 要求具体来源与数字；CITED 的 Independent Evidence 更强调原创数据与具名引用。</div>
+    <div class="diff"><strong>结构要求</strong>：CRASP 的 Structure 偏可读格式；CITED 的 Typed Structure 额外要求 schema 与可见文本一致性。</div>
+    <div class="diff"><strong>实体范围</strong>：CRASP 未单独强调全网一致性；CITED 的 Entity Consistency 是跨站点、跨平台的硬要求。</div>
+  </div>
+
+  <div class="card">
+    <h2>互补使用建议</h2>
+    <p>1. <strong>撰写阶段</strong>：用 CRASP 逐段检查（清晰、相关、有来源、结构好、有数字）。</p>
+    <p>2. <strong>发布前</strong>：用 CITED 做页面级检查（答案前置、证据独立、结构一致、实体统一）。</p>
+    <p>3. <strong>发布后</strong>：用 CITED 的 Decay Monitoring + 系统的 citation_monitor 追踪引用衰减并刷新。</p>
+    <p>4. 两者重叠区（Clear Answer / Clarity、Evidence / Authority+Precision、Structure）可作为共同通过标准。</p>
+  </div>
+</div>
+{% endblock %}

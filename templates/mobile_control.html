@@ -1,35 +1,73 @@
 {% extends "base.html" %}
 {% block title %}手机控制台{% endblock %}
-{% block body_class %}page-mobile{% endblock %}
-{% block chart_lib %}{% endblock %}
+{% block heading %}SEO 可视化控制台{% endblock %}
+{% block head %}
+<style>
+.mc { max-width: 640px; margin: 0 auto; }
+.section { margin-bottom: 16px; }
+.section h2 { font-size: 13px; color: var(--muted); margin-bottom: 8px; padding-left: 4px; font-weight: 600; }
+.mc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; }
+.mc-card:hover { border-color: var(--accent); }
+.mc-card:active { background: var(--surface); }
+.card-title { font-weight: 600; font-size: 15px; }
+.card-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.arrow { color: var(--faint); font-size: 18px; }
+.badge { background: var(--tint-blue); color: var(--ink-blue); font-size: 10px; padding: 2px 6px; border-radius: 99px; margin-left: 6px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; text-decoration: none; color: inherit; }
+.stat-num { font-size: 22px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 11px; color: var(--muted); }
+.mc-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; }
+.mc-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+</style>
+{% endblock %}
 {% block content %}
-<div class="phone">
-  <header class="mobile-header">
-    <p>SEO 学习可视化</p>
-    <h1>手机控制台</h1>
-  </header>
-  <div class="phone-body">
-    <div class="stats stats-2">
-      <div class="stat"><div class="stat-num">{{ stage_count }}</div><div class="stat-label">工作流阶段</div></div>
-      <div class="stat"><div class="stat-num">{{ dimension_count }}</div><div class="stat-label">评分维度</div></div>
-      <div class="stat"><div class="stat-num">{{ threshold }}</div><div class="stat-label">质量阈值</div></div>
-      <div class="stat"><div class="stat-num">HITL</div><div class="stat-label">人工确认</div></div>
-    </div>
-    {% for section in sections %}
-    <section class="section">
-      <h2>{{ section.title }}</h2>
-      {% for item in section["items"] %}
-      <a class="jump" href="{{ item.path }}">
-        <span>
-          <strong>{{ item.label }}</strong>
-          <small>{{ item.description }}</small>
-        </span>
-        <span aria-hidden="true">›</span>
-      </a>
-      {% endfor %}
-    </section>
-    {% endfor %}
-    <p class="hint">外展前要人工确认。质量阈值 {{ threshold }}。</p>
+<div class="mc">
+  <div class="stats">
+    <a class="stat" href="/"><div class="stat-num">{{ m.tasks_total }}</div><div class="stat-label">学习任务（已完成 {{ m.tasks_done }}）</div></a>
+    <a class="stat" href="/"><div class="stat-num">{{ m.avg_progress|round|int }}%</div><div class="stat-label">平均进度</div><div class="mc-bar"><i style="width:{{ m.avg_progress }}%"></i></div></a>
+    <a class="stat" href="/ai"><div class="stat-num">{{ m.agent_runs }}</div><div class="stat-label">智能体任务完成（{{ m.agent_count }} 个 Agent）</div></a>
+    <a class="stat" href="/seo-workflow"><div class="stat-num">{{ m.workflow_stages }}</div><div class="stat-label">工作流阶段 · 外链阈值 {{ "%.2f"|format(m.backlink_threshold) }}</div></a>
+  </div>
+
+  {% if m.wf.waiting_approval %}<a class="callout warn" style="display:block;text-decoration:none" href="/workflow-runs">⏸ 有 {{ m.wf.waiting_approval }} 个工作流在等你审批 ›</a>{% endif %}
+  <div class="section">
+    <h2>核心入口</h2>
+    <a class="mc-card" href="/overview"><div><div class="card-title">系统总览</div><div class="card-desc">全部页面导航</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/dashboard"><div><div class="card-title">仪表盘</div><div class="card-desc">看板与状态</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/"><div><div class="card-title">学习看板</div><div class="card-desc">{{ m.in_progress }} 个任务进行中</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/workflow-runs"><div><div class="card-title">工作流审批台 <span class="badge">LangGraph</span></div><div class="card-desc">{{ m.wf.total }} 次运行 · {{ m.wf.waiting_approval }} 个待审批</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/ai"><div><div class="card-title">AI 管理中心</div><div class="card-desc">Agent 与工作流</div></div><span class="arrow">›</span></a>
+  </div>
+
+  <div class="section">
+    <h2>外链分析</h2>
+    <a class="mc-card" href="/backlink"><div><div class="card-title">外链策略</div><div class="card-desc">2026 品牌提及与质量</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/backlink-competitor"><div><div class="card-title">竞品结构</div><div class="card-desc">差距分析 Link Intersect</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/backlink-competitor-quality"><div><div class="card-title">竞品质量</div><div class="card-desc">分层与模式识别</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/backlink-score-model"><div><div class="card-title">评分模型</div><div class="card-desc">六维加权解析</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/anchor-text"><div><div class="card-title">锚文本分布</div><div class="card-desc">自然度与风险</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/backlink-tools"><div><div class="card-title">四工具流程</div><div class="card-desc">研究 → 差距 → 评分 → 验证</div></div><span class="arrow">›</span></a>
+  </div>
+
+  <div class="section">
+    <h2>SEO 知识</h2>
+    <a class="mc-card" href="/seo-tools"><div><div class="card-title">工具对比 <span class="badge">最新</span></div><div class="card-desc">Ahrefs / Semrush / Moz</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/seo-2026"><div><div class="card-title">2026 SEO 知识</div><div class="card-desc">算法与 AI Overviews</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/aio-optimize"><div><div class="card-title">AI Overviews</div><div class="card-desc">优化清单</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/eeat"><div><div class="card-title">E-E-A-T</div><div class="card-desc">信任信号</div></div><span class="arrow">›</span></a>
+  </div>
+
+  <div class="section">
+    <h2>自动化</h2>
+    <a class="mc-card" href="/seo-workflow"><div><div class="card-title">SEO 工作流</div><div class="card-desc">{{ m.workflow_stages }} 阶段管道</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/ai-workflow"><div><div class="card-title">AI 工作流</div><div class="card-desc">编排与 HITL</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/multi-agent"><div><div class="card-title">多智能体</div><div class="card-desc">协作模式</div></div><span class="arrow">›</span></a>
+    <a class="mc-card" href="/agent-architecture"><div><div class="card-title">多 AI 架构路线图 <span class="badge">新</span></div><div class="card-desc">Supervisor + LangGraph + HITL</div></div><span class="arrow">›</span></a>
+  </div>
+
+  <div style="text-align:center; padding: 12px; font-size: 12px; color: var(--faint);">
+    手机控制台 · 数据实时更新 · 共 {{ page_count }} 个页面（<a href="/sitemap">查看全部</a>）
   </div>
 </div>
 {% endblock %}

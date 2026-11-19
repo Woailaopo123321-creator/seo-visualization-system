@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}竞品链接质量评分模型{% endblock %}
+{% block heading %}竞品链接质量评分模型{% endblock %}
+{% block related %}<a href="/backlink-competitor-quality">质量分层</a><a href="/backlink-quality">通用指标</a><a href="/backlink-competitor">结构分析</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.formula { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; margin: 8px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+th { background: var(--surface-2); }
+.high { color: var(--ok); font-weight: 600; }
+.low { color: var(--danger); font-weight: 600; }
+.score-play { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; align-items: start; }
+.score-form label { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; margin-bottom: 10px; font-size: 13px; }
+.score-form input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+.score-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+.score-num { font-size: 48px; font-weight: 700; line-height: 1; font-family: "Noto Serif SC", serif; }
+.score-state { margin-top: 8px; font-weight: 700; }
+@media (max-width: 860px) { .score-play { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>模型目标</h2>
+    <div class="note"><strong>核心</strong>评估竞品链接是否值得复制或超越，而非仅看权威分数。</div>
+    <div class="note"><strong>原则</strong>主题相关性优先，编辑性位置与真实流量次之，权威分数仅辅助。</div>
+    <div class="note"><strong>输出</strong>0-1 分数 + 分层建议（高/中/低）+ 外展优先级。</div>
+  </div>
+
+  <div class="card">
+    <h2>加权公式</h2>
+    <div class="formula">
+score = relevance × 0.30<br>
+      + editorial × 0.20<br>
+      + traffic × 0.15<br>
+      + anchor × 0.15<br>
+      + authority × 0.10<br>
+      + neighborhood × 0.10
+    </div>
+    <p class="muted">各特征独立评分（0-1），加权求和。阈值 0.70 为优先外展线。</p>
+  </div>
+
+  <div class="card">
+    <h2>特征定义与评分标准</h2>
+    <table>
+      <tr><th>特征</th><th>权重</th><th>高分（0.8+）</th><th>低分（<0.5）</th></tr>
+      <tr><td>主题相关性</td><td>30%</td><td>直接覆盖细分领域，页面主题高度匹配</td><td>泛泛提及或完全无关</td></tr>
+      <tr><td>编辑性位置</td><td>20%</td><td>正文段落、资源列表、推荐位置</td><td>页脚、侧边栏、全站模板</td></tr>
+      <tr><td>真实流量</td><td>15%</td><td>稳定有机流量，页面有排名</td><td>无流量、突降或仅为域名流量</td></tr>
+      <tr><td>锚文本自然度</td><td>15%</td><td>品牌名、通用描述、部分匹配</td><td>精确匹配关键词过高</td></tr>
+      <tr><td>权威分数</td><td>10%</td><td>相对竞争水平合理（非绝对高）</td><td>极低或可疑突增</td></tr>
+      <tr><td>链接邻里</td><td>10%</td><td>周围出站链接相关、干净</td><td>垃圾链接多、混合不相关</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>评分示例（模拟）</h2>
+    <table>
+      <tr><th>链接来源</th><th>相关性</th><th>编辑性</th><th>流量</th><th>锚文本</th><th>权威</th><th>邻里</th><th>总分</th><th>分层</th></tr>
+      <tr><td>行业数据报告</td><td>0.92</td><td>0.88</td><td>0.75</td><td>0.90</td><td>0.70</td><td>0.82</td><td class="high">0.85</td><td>高价值</td></tr>
+      <tr><td>资源列表页</td><td>0.85</td><td>0.80</td><td>0.60</td><td>0.75</td><td>0.65</td><td>0.78</td><td class="high">0.76</td><td>高价值</td></tr>
+      <tr><td>新闻报道</td><td>0.70</td><td>0.65</td><td>0.55</td><td>0.82</td><td>0.75</td><td>0.70</td><td>0.68</td><td>中等</td></tr>
+      <tr><td>目录提交</td><td>0.40</td><td>0.30</td><td>0.25</td><td>0.50</td><td>0.45</td><td>0.35</td><td class="low">0.38</td><td>低价值</td></tr>
+    </table>
+    <p class="muted">高分链接优先复制；中等需提升相关性或位置；低分跳过。</p>
+  </div>
+
+  <div class="card">
+    <h2>应用于竞品差距分析</h2>
+    <ol style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>导出链接到 2+ 竞争对手的域名</li>
+      <li>对每条链接计算六维特征分数</li>
+      <li>加权求和，按阈值分层</li>
+      <li>高分（≥0.70）进入优先外展列表</li>
+      <li>识别模式：数据驱动、资源页、媒体 PR</li>
+      <li>HITL 人工确认后执行</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>模型局限与人工闸门</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>特征评分依赖人工或规则判断，自动化仅作初筛</li>
+      <li>权威分数易被操纵，故权重最低</li>
+      <li>付费链接即使高分也应排除</li>
+      <li>最终外展决策必须经过 HITL 确认</li>
+      <li>模型需定期根据实际外展成功率校准</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>交互试算</h2>
+    <p class="muted">拖动滑块即时计算质量分；达到 0.70 只表示进入外展候选，发出前仍要人工确认。</p>
+    <div class="score-play">
+      <form id="score-form" class="score-form">
+        <label>相关性 30%<output id="out-topical_relevance">0.85</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.85" data-key="topical_relevance">
+        </label>
+        <label>编辑性 20%<output id="out-editorial_placement">0.78</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.78" data-key="editorial_placement">
+        </label>
+        <label>流量 15%<output id="out-real_traffic">0.62</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.62" data-key="real_traffic">
+        </label>
+        <label>锚文本 15%<output id="out-anchor_naturalness">0.88</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.88" data-key="anchor_naturalness">
+        </label>
+        <label>权威 10%<output id="out-authority_score">0.70</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.70" data-key="authority_score">
+        </label>
+        <label>邻里 10%<output id="out-link_neighborhood">0.75</output>
+          <input type="range" min="0" max="1" step="0.01" value="0.75" data-key="link_neighborhood">
+        </label>
+      </form>
+      <div class="score-panel" aria-live="polite">
+        <div class="score-num" id="score-num">0.78</div>
+        <div class="score-state" id="score-state">已达阈值</div>
+        <p class="muted" id="score-gate">已达阈值，可以进入外展候选，发出前必须人工确认</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="muted">竞品链接质量评分模型以相关性为核心，将差距列表转化为可执行的优先外展目标。高分链接揭示值得复制的模式，低分链接则提示应避免的风险。</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const WEIGHTS = {
+    topical_relevance: 0.30,
+    editorial_placement: 0.20,
+    real_traffic: 0.15,
+    anchor_naturalness: 0.15,
+    authority_score: 0.10,
+    link_neighborhood: 0.10,
+  };
+  const THRESHOLD = 0.70;
+  const form = document.getElementById("score-form");
+  const numEl = document.getElementById("score-num");
+  const stateEl = document.getElementById("score-state");
+  const gateEl = document.getElementById("score-gate");
+
+  function readFeatures() {
+    const features = {};
+    form.querySelectorAll("input[type=range]").forEach((input) => {
+      features[input.dataset.key] = Math.round(Number(input.value) * 100) / 100;
+    });
+    return features;
+  }
+
+  function render() {
+    const features = readFeatures();
+    let total = 0;
+    Object.keys(WEIGHTS).forEach((key) => {
+      total += features[key] * WEIGHTS[key];
+      const out = document.getElementById("out-" + key);
+      if (out) out.textContent = features[key].toFixed(2);
+    });
+    const score = Math.round(total * 100) / 100;
+    const passed = score >= THRESHOLD;
+    numEl.textContent = score.toFixed(2);
+    numEl.className = "score-num " + (passed ? "high" : "low");
+    stateEl.textContent = passed ? "已达阈值" : "未达阈值";
+    stateEl.className = "score-state " + (passed ? "high" : "low");
+    gateEl.textContent = passed
+      ? "已达阈值，可以进入外展候选，发出前必须人工确认"
+      : "未达阈值。若仍要联系，必须人工确认";
+  }
+
+  form.addEventListener("input", render);
+  render();
+})();
+</script>
+{% endblock %}

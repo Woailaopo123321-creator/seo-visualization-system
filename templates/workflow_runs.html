@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% block title %}工作流审批台{% endblock %}
+{% block heading %}✅ SEO 工作流审批台（LangGraph）{% endblock %}
+{% block subheading %}{{ spec.stage_count }} 个阶段 · {{ spec.required_gates|length }} 个必选 + {{ spec.optional_gates|length }} 个可选人工闸门（interrupt 真暂停）· 并行审计分支 · SQLite 检查点，重启可继续{% endblock %}
+{% block related %}<a href="/agent-architecture">架构与路线图</a><a href="/agent-patterns">模式与框架</a><a href="/seo-workflow">旧版一次跑完</a><a href="/langgraph">LangGraph 知识</a>{% endblock %}
+{% block head %}
+<style>
+.wf { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 14px; align-items: start; }
+.wf > * { min-width: 0; }
+#detail { min-height: 640px; }
+#runs { min-height: 180px; }
+.wf-side .card { margin-bottom: 12px; }
+.wf-side label.f { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px; }
+.wf-side input:not([type=checkbox]) { width: 100%; }
+.opt-gates { border: 1px dashed var(--border); border-radius: 8px; padding: 6px 10px 8px; margin-top: 10px; }
+.opt-gates legend { font-size: 12px; color: var(--muted); padding: 0 4px; }
+.opt-gates label { display: flex; gap: 8px; align-items: center; font-size: 13px; min-height: 32px; cursor: pointer; }
+.counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; margin-top: 12px; min-height: 52px; }
+.counts div { background: var(--surface); border-radius: 8px; padding: 6px 4px; }
+.counts b { display: block; font-size: 18px; color: var(--accent); }
+.counts span { font-size: 11px; color: var(--muted); }
+.runs-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.runs-head h2 { margin: 0; }
+.run-item { display: block; width: 100%; text-align: left; background: transparent; color: inherit; font-weight: 400; padding: 9px 10px; border-radius: 8px; border: 1px solid transparent; margin-bottom: 4px; min-height: 44px; }
+.run-item:hover { background: var(--surface); filter: none; }
+.run-item.active { border-color: var(--accent); background: var(--accent-soft); }
+.run-item .t { font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 6px; }
+.run-item .m { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pipeline { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; align-items: stretch; }
+.phase { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; min-width: 132px; flex: 1; }
+.phase.parallel { border-style: dashed; border-color: var(--line-indigo); background: var(--tint-indigo); }
+.phase h3 { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.stage { font-size: 12px; padding: 6px 8px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); margin-bottom: 5px; display: flex; justify-content: space-between; gap: 4px; align-items: center; }
+.stage.done { background: var(--tint-green); border-color: var(--line-green); }
+.stage.current { border: 2px solid var(--accent); }
+.stage.skipped { opacity: .5; text-decoration: line-through; }
+.stage .plug { font-size: 10px; padding: 1px 4px; border-radius: 4px; background: var(--surface-2); color: var(--muted); flex: none; }
+.stage .plug.LLM { background: var(--tint-purple); color: var(--ink-purple); }
+.stage .plug.MCP { background: var(--tint-blue); color: var(--ink-blue); }
+.gate { align-self: center; flex: none; width: 38px; text-align: center; font-size: 11px; color: var(--muted); }
+.gate .d { width: 22px; height: 22px; transform: rotate(45deg); margin: 0 auto 6px; border: 2px solid var(--border); background: var(--card); border-radius: 4px; }
+.gate.approved .d { background: #10b981; border-color: #10b981; }
+.gate.waiting .d { background: #f59e0b; border-color: #f59e0b; animation: pulse 1.4s infinite; }
+.gate.rejected .d { background: #ef4444; border-color: #ef4444; }
+.gate.off { opacity: .55; }
+.gate.off .d { border-style: dashed; background: transparent; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(245,158,11,.25); } }
+.approval { border: 2px solid #f59e0b; background: var(--tint-amber); }
+.approval h2 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.approval h2:focus { outline: none; }
+.approval textarea, .approval input[type=text], .approval select { width: 100%; margin: 4px 0 8px; }
+.target { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 13px; min-height: 44px; cursor: pointer; }
+.target .s { margin-left: auto; font-weight: 600; }
+.kv { display: grid; grid-template-columns: 120px 1fr; gap: 4px 10px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.legend { font-size: 11px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.legend .c-ok { color: var(--ok); } .legend .c-warn { color: var(--warn); } .legend .c-bad { color: var(--danger); }
+details.box summary { cursor: pointer; font-weight: 600; font-size: 14px; min-height: 44px; display: flex; align-items: center; }
+.detail-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.detail-head h2 { margin: 0; }
+@media (max-width: 900px) { .wf { grid-template-columns: minmax(0, 1fr); } .wf-side { order: 2; } .kv { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .hide-sm { display: none; } .approval td, .card td { min-width: 64px; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="callout info">📚 这一页把《<a href="/agent-architecture">多 AI 自动化架构</a>》路线图第 1 阶段落地：确定性流水线跑在 LangGraph 图上，遇到闸门会<strong>真正暂停</strong>，由你批准、修改或拒绝后再继续。工具目前是<strong>示例数据（模拟）</strong>，标 <span class="pill info">MCP</span> 的可接真实数据源，标 <span class="pill llm">LLM</span> 的需要模型密钥，本版本未接入。</div>
+<div class="wf">
+  <aside class="wf-side no-print" aria-label="启动与运行历史">
+    <form class="card" id="start-form" autocomplete="off">
+      <h2>▶ 启动新运行</h2>
+      <label class="f" for="wf-site">站点</label><input id="wf-site" value="example.com" maxlength="200" required>
+      <label class="f" for="wf-topic">主题</label><input id="wf-topic" value="主题权威建设" maxlength="100" required>
+      <fieldset class="opt-gates">
+        <legend>可选闸门（勾选后也会暂停等你审批）</legend>
+        {% for g in spec.gates if g.optional %}
+        <label><input type="checkbox" name="opt-gate" value="{{ g.id }}" {% if g.id in default_optional %}checked{% endif %}> {{ g.title }}</label>
+        {% endfor %}
+      </fieldset>
+      <button type="submit" style="width:100%;margin-top:12px">启动工作流</button>
+      <div class="counts" id="counts" aria-live="polite"></div>
+    </form>
+    <div class="card">
+      <div class="runs-head"><h2>🕘 运行历史</h2><button type="button" class="btn-danger btn-sm" id="reset-btn" title="删除全部运行记录与检查点">清空全部</button></div>
+      <div id="runs"></div>
+    </div>
+  </aside>
+  <section id="detail" aria-live="polite" aria-label="运行详情"></section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const SPEC = {{ spec|tojson }};
+const GATE_BY_ID = Object.fromEntries(SPEC.gates.map(g => [g.id, g]));
+const esc = SEO.escapeHtml;
+const STATUS = {waiting_approval: ["⏸ 待审批", "warn"], running: ["运行中", "info"], completed: ["✔ 已完成", "ok"], rejected: ["✖ 已拒绝", "bad"]};
+const GATE_STATE = {approved: "已批准", waiting: "待审批", rejected: "已拒绝", pending: "未到达", off: "未启用（可选）"};
+const ACTION = {approve: "批准", edit: "修改后批准", reject: "拒绝"};
+let current = new URLSearchParams(location.search).get("run");
+
+function pill(status) { const [l, c] = STATUS[status] || [status, ""]; return `<span class="pill ${c}">${esc(l)}</span>`; }
+
+async function loadRuns() {
+  const data = await SEO.request("/api/workflow/runs");
+  const c = data.counts;
+  document.getElementById("counts").innerHTML = `<div><b>${c.total}</b><span>运行</span></div><div><b>${c.waiting_approval}</b><span>待审批</span></div><div><b>${c.completed}</b><span>已完成</span></div>`;
+  const runs = data.runs;
+  document.getElementById("reset-btn").disabled = !runs.length;
+  if (current && !runs.some(r => r.thread_id === current)) current = null;
+  if (!current && runs.length) current = (runs.find(r => r.status === "waiting_approval") || runs[0]).thread_id;
+  if (runs.length) {
+    document.getElementById("runs").innerHTML = runs.map(r => `
+      <button type="button" class="run-item ${r.thread_id === current ? "active" : ""}" data-id="${esc(r.thread_id)}" ${r.thread_id === current ? 'aria-current="true"' : ""}>
+        <div class="t"><span>${esc(r.topic)}</span>${pill(r.status)}</div>
+        <div class="m">${esc(r.site)} · ${esc(r.pending_gate_title || r.current_stage_title || "")}</div>
+        <div class="m">${esc(r.thread_id)} · <time datetime="${esc(r.created_at)}">${esc(SEO.fmtTime(r.created_at))}</time></div>
+      </button>`).join("");
+  } else {
+    SEO.empty("runs", "还没有运行", "在上方填写站点和主题，启动第一次运行", "🕘");
+  }
+  return runs;
+}
+
+function renderPipeline(v) {
+  const parts = [];
+  SPEC.phases.forEach(ph => {
+    const stages = ph.stages.map(s => `<div class="stage ${v.stages[s.id]}" title="${esc(s.id)}"><span>${v.stages[s.id] === "done" ? "✓ " : ""}${esc(s.title)}</span>${s.plug ? `<span class="plug ${s.plug}">${s.plug}</span>` : ""}</div>`);
+    parts.push(`<div class="phase ${ph.parallel ? "parallel" : ""}"><h3><span>${esc(ph.title)}</span>${ph.parallel ? "<span>⇉ 并行</span>" : ""}</h3>${stages.join("")}</div>`);
+    ph.gates_after.forEach(g => {
+      const gs = GATE_BY_ID[g]; const st = v.gates[g] || "pending";
+      parts.push(`<div class="gate ${st}" title="${esc(gs.title)}：${GATE_STATE[st]}" role="img" aria-label="闸门 ${esc(gs.title)}：${GATE_STATE[st]}"><div class="d"></div>${esc(gs.short)}</div>`);
+    });
+  });
+  return `<div class="pipeline">${parts.join("")}</div>
+    <div class="legend"><span>◆ 人工闸门：<span class="c-ok">绿=已批准</span> <span class="c-warn">橙=待审批</span> <span class="c-bad">红=已拒绝</span> 虚线=可选未启用</span><span>MCP = 可接真实数据源</span><span>LLM = 需模型密钥（当前模板生成）</span></div>`;
+}
+
+function renderProposal(p) {
+  const g = p.gate, pr = p.proposal || {};
+  if (g === "keywords") return `<label class="muted" for="ed-keywords">优先关键词（每行一个，可直接修改）</label><textarea id="ed-keywords" rows="5">${esc((pr.priority_keywords || []).join("\n"))}</textarea>
+      <p class="muted">基准：${esc(SEO.display(p.context.benchmark || {}))}</p>`;
+  if (g === "brief") return `<label class="muted" for="ed-title">简报标题（v${esc(pr.version)}）</label><input type="text" id="ed-title" value="${esc(pr.title || "")}" maxlength="100">
+      <label class="muted" for="ed-outline">大纲（每行一节）</label><textarea id="ed-outline" rows="7">${esc((pr.outline || []).join("\n"))}</textarea>
+      <p class="muted">目标关键词：${esc((pr.target_keywords || []).join("、"))} · 剩余可重写次数：${esc(p.revisions_left)}</p>`;
+  if (g === "fanout") return `<label class="muted" for="ed-subq">要覆盖的扇出子问题（每行一个，最多 10 个）</label><textarea id="ed-subq" rows="5">${esc((pr.subquestions || []).join("\n"))}</textarea>
+      <p class="muted">覆盖策略：${esc(pr.coverage_strategy || "")} · ${esc(pr.recommendation || "")}</p>`;
+  if (g === "tool_select") return `<label class="muted" for="ed-tool">外链数据工具（建议：${esc(pr.tool || "")}，备选：${esc(pr.alternative || "")}）</label>
+      <select id="ed-tool">${(pr.options || []).map(o => `<option ${o === pr.tool ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>
+      <p class="muted">理由：${esc(pr.reason || "")}</p>`;
+  if (g === "publish") return `<dl class="kv">
+      <dt>简报</dt><dd>${esc(pr.brief_title || "")}</dd>
+      <dt>DL 引用概率</dt><dd>${esc(pr.citation_probability)}（${esc(pr.citation_grade || "")}）</dd>
+      <dt>QA 待改进</dt><dd>${(pr.qa_issues || []).map(esc).join("；")}</dd>
+      <dt>段落审计</dt><dd>${esc((pr.audits || {}).passage || "")}</dd>
+      <dt>AI 引用率</dt><dd>${esc((pr.audits || {}).citation_rate || "")}</dd>
+      <dt>扇出子问题</dt><dd>${((pr.audits || {}).fanout_subquestions || []).map(esc).join("、")}</dd></dl>`;
+  if (g === "outreach") return `<p class="muted">质量阈值 ${esc(Number(pr.threshold).toFixed(2))}：勾选允许外展的目标（默认勾选达标项）。</p>` +
+      (pr.targets || []).map(t => `<label class="target"><input type="checkbox" class="ed-target" value="${esc(t.domain)}" ${(pr.approved_targets || []).includes(t.domain) ? "checked" : ""}>
+        <span>${esc(t.domain)}</span>${t.pass ? '<span class="pill ok">达标</span>' : '<span class="pill bad">低于阈值</span>'}<span class="s">${esc(t.score)}</span></label>`).join("");
+  return `<pre>${esc(SEO.display(pr))}</pre>`;
+}
+
+function collectEdits(g) {
+  const lines = id => document.getElementById(id).value.split("\n").map(s => s.trim()).filter(Boolean);
+  if (g === "keywords") return {priority_keywords: lines("ed-keywords")};
+  if (g === "brief") return {title: document.getElementById("ed-title").value.trim(), outline: lines("ed-outline")};
+  if (g === "fanout") return {subquestions: lines("ed-subq")};
+  if (g === "tool_select") return {tool: document.getElementById("ed-tool").value};
+  if (g === "outreach") return {approved_targets: [...document.querySelectorAll(".ed-target:checked")].map(x => x.value)};
+  return {};
+}
+
+function renderApproval(v) {
+  const p = v.pending_approval; if (!p) return "";
+  const editable = (p.editable || []).length > 0;
+  const optional = (GATE_BY_ID[p.gate] || {}).optional;
+  return `<div class="card approval" id="approval">
+    <h2 id="approval-title" tabindex="-1">⏸ 待你审批：${esc(p.title)} <span class="pill ${p.priority === "高" ? "bad" : "warn"}">优先级 ${esc(p.priority)}</span>${optional ? '<span class="pill">可选闸门</span>' : ""}</h2>
+    <p class="muted" style="margin-bottom:10px">${esc(p.description)}</p>
+    ${renderProposal(p)}
+    <label class="muted" for="ed-comment">审批意见（可选，会写入记忆提取）</label>
+    <textarea id="ed-comment" rows="2" maxlength="500" placeholder="例如：优先做长尾词"></textarea>
+    <div class="row">
+      <button type="button" class="btn-ok" data-act="approve">✔ 批准</button>
+      ${editable ? '<button type="button" data-act="edit">✎ 按修改批准</button>' : ""}
+      <button type="button" class="btn-no" data-act="reject">✖ ${esc(p.reject_label || "拒绝")}</button>
+    </div>
+  </div>`;
+}
+
+function renderDetail(v, focusApproval) {
+  const sc = v.scores || {};
+  const summary = v.summary ? `<div class="callout ok">🎉 已完成：简报「${esc(v.summary.brief_title || "")}」，外展目标 ${esc((v.summary.outreach_targets || []).join("、") || "无")}，共 ${esc(v.summary.approvals)} 次人工审批。</div>` : "";
+  const rejected = v.status === "rejected" ? `<div class="callout warn">✖ 该运行已在闸门处被拒绝，后续阶段未执行。可以在左侧重新启动一次。</div>` : "";
+  const approvals = (v.approvals || []).length ? `<div class="table-wrap"><table><thead><tr><th scope="col">闸门</th><th scope="col">决定</th><th scope="col">意见</th><th scope="col" class="hide-sm">修改</th><th scope="col">时间（${esc(SEO.tzLabel())}）</th></tr></thead><tbody>${v.approvals.map(a => `<tr><td>${esc(a.title)}</td><td>${a.action === "reject" ? '<span class="pill bad">拒绝</span>' : `<span class="pill ok">${esc(ACTION[a.action])}</span>`}</td><td>${esc(a.comment || "—")}</td><td class="hide-sm">${Object.keys(a.edits || {}).length ? `<code>${esc(JSON.stringify(a.edits))}</code>` : "—"}</td><td><time datetime="${esc(a.at)}">${esc(SEO.fmtTime(a.at, {bare: true}))}</time></td></tr>`).join("")}</tbody></table></div>` : '<p class="muted">暂无审批记录。</p>';
+  const traj = (v.trajectory || []).map((t, i) => ({...t, step: i + 1, tool: t.title ? `${t.tool}（${t.title}）` : t.tool}));
+  const opt = (v.enabled_gates || []).filter(g => (GATE_BY_ID[g] || {}).optional).map(g => GATE_BY_ID[g].short);
+  document.getElementById("detail").innerHTML = `
+    <div class="card">
+      <div class="detail-head">
+        <h2>${esc(v.topic)} <span class="muted">· ${esc(v.site)}</span></h2>
+        <div class="row">${pill(v.status)}<button type="button" class="btn-danger btn-sm" id="delete-btn">删除此运行</button></div>
+      </div>
+      <p class="muted" style="margin:4px 0 10px">thread_id：<code>${esc(v.thread_id)}</code> · 进度 ${v.progress.done}/${v.progress.total} · 引用概率 ${esc(sc.citation_probability ?? "—")} · 外链质量 ${esc(sc.backlink_quality ?? "—")}${v.brief_revision ? ` · 简报重写 ${v.brief_revision} 次` : ""} · 可选闸门：${esc(opt.join("、") || "未启用")}</p>
+      ${renderPipeline(v)}
+    </div>
+    ${summary}${rejected}${renderApproval(v)}
+    <div class="card"><h2>📝 审批记录</h2>${approvals}</div>
+    <div class="card"><details class="box"><summary>🧭 执行轨迹（${traj.length} 条）</summary>${SEO.renderTrajectory(traj, "执行轨迹")}</details></div>
+    <div class="card"><details class="box"><summary>📦 各阶段产出（artifacts）</summary><pre>${esc(JSON.stringify(v.artifacts, null, 2))}</pre></details></div>`;
+  const box = document.getElementById("approval");
+  if (box) {
+    box.addEventListener("click", ev => {
+      const b = ev.target.closest("button[data-act]"); if (!b) return;
+      decide(b, v, b.dataset.act);
+    });
+    if (focusApproval) document.getElementById("approval-title").focus({preventScroll: false});
+  }
+  document.getElementById("delete-btn").addEventListener("click", ev => removeRun(ev.currentTarget, v));
+}
+
+async function decide(btn, v, action) {
+  const g = v.pending_approval.gate;
+  const body = {action, gate: g, comment: document.getElementById("ed-comment").value};
+  if (action === "edit") body.edits = collectEdits(g);
+  if (action === "reject" && !confirm(`确定要「${v.pending_approval.reject_label || "拒绝"}」吗？`)) return;
+  document.querySelectorAll("#approval button").forEach(b => { if (b !== btn) b.disabled = true; });
+  await SEO.withButton(btn, async () => {
+    try {
+      const nv = await SEO.postJSON(`/api/workflow/runs/${v.thread_id}/resume`, body);
+      SEO.toast(nv.pending_approval ? `已${ACTION[action]}，流水线继续到：${nv.pending_approval.title}` : `已${ACTION[action]}，状态：${(STATUS[nv.status] || [nv.status])[0]}`, action === "reject" ? "warn" : "ok");
+      renderDetail(nv, true); loadRuns();
+    } catch (e) {
+      SEO.toast("操作失败：" + e.message, "error");
+      document.querySelectorAll("#approval button").forEach(b => { b.disabled = false; });
+    }
+  }, "提交中…");
+}
+
+async function removeRun(btn, v) {
+  if (!confirm(`删除运行「${v.topic}」（${v.thread_id}）？检查点和审批记录都会删除，不能撤销。`)) return;
+  await SEO.withButton(btn, async () => {
+    try {
+      await SEO.request(`/api/workflow/runs/${encodeURIComponent(v.thread_id)}`, {method: "DELETE"});
+      SEO.toast("已删除该运行", "ok");
+      current = null; await refresh();
+    } catch (e) { SEO.toast("删除失败：" + e.message, "error"); }
+  }, "删除中…");
+}
+
+async function show(id) {
+  current = id;
+  history.replaceState(null, "", "?run=" + encodeURIComponent(id));
+  document.querySelectorAll(".run-item").forEach(a => {
+    a.classList.toggle("active", a.dataset.id === id);
+    if (a.dataset.id === id) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+  });
+  SEO.loading("detail", "正在读取运行状态…");
+  try { renderDetail(await SEO.request(`/api/workflow/runs/${encodeURIComponent(id)}`)); SEO.done("detail"); }
+  catch (e) { SEO.failed("detail", e, () => show(id)); }
+}
+
+function showEmpty() {
+  history.replaceState(null, "", location.pathname);
+  document.getElementById("detail").innerHTML = '<div class="card"><div class="state"><div class="icon" aria-hidden="true">🧭</div><strong>还没有工作流运行</strong><span>在左侧填写站点和主题，点击「启动工作流」。流水线会自动执行到「关键词优先级确认」闸门并暂停，等你审批。</span></div></div>';
+}
+
+async function refresh() {
+  try {
+    await loadRuns();
+    if (current) await show(current); else showEmpty();
+  } catch (e) { SEO.failed("runs", e, refresh); SEO.failed("detail", e, refresh); }
+}
+
+document.getElementById("runs").addEventListener("click", ev => { const a = ev.target.closest(".run-item"); if (a) show(a.dataset.id); });
+document.getElementById("start-form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const optional_gates = [...document.querySelectorAll('input[name="opt-gate"]:checked')].map(x => x.value);
+  await SEO.withButton(ev.target.querySelector('button[type="submit"]'), async () => {
+    try {
+      const v = await SEO.postJSON("/api/workflow/runs", {site: document.getElementById("wf-site").value, topic: document.getElementById("wf-topic").value, optional_gates});
+      current = v.thread_id; await loadRuns(); await show(v.thread_id);
+      SEO.toast("已启动，流水线停在第一个闸门等待审批", "ok");
+      const t = document.getElementById("approval-title"); if (t) t.focus();
+    } catch (e) { SEO.toast("启动失败：" + e.message, "error"); }
+  }, "启动中…");
+});
+document.getElementById("reset-btn").addEventListener("click", async ev => {
+  if (!confirm("清空全部工作流运行？所有检查点与审批记录都会删除，不能撤销。（适合清理演示数据）")) return;
+  await SEO.withButton(ev.currentTarget, async () => {
+    try {
+      const r = await SEO.postJSON("/api/workflow/reset", {confirm: true});
+      SEO.toast(`已清空 ${r.deleted} 条运行`, "ok");
+      current = null; await refresh();
+    } catch (e) { SEO.toast("清空失败：" + e.message, "error"); }
+  }, "清空中…");
+  ev.target.disabled = !document.querySelector(".run-item");
+});
+
+SEO.loading("runs", "加载中…", true);
+SEO.loading("detail", "正在加载…");
+refresh();
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}SEO 工具功能对比{% endblock %}
+{% block heading %}SEO 工具功能对比{% endblock %}
+{% block related %}<a href="/backlink">外链策略</a><a href="/seo-2026">2026 知识</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+th, td { border: 1px solid var(--border); padding: 5px 6px; text-align: left; }
+th { background: var(--surface-2); }
+.cat { font-weight: 600; color: var(--accent); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>主流工具定位（2026）</h2>
+    <div class="note"><strong>Ahrefs</strong>外链研究与竞品分析最强。Site Explorer、Link Intersect、断链机会。适合链接建设与深度研究。</div>
+    <div class="note"><strong>Semrush</strong>全栈营销套件。SEO + PPC + 内容 + AI 可见度。适合需要一站式的团队与机构。</div>
+    <div class="note"><strong>Moz</strong>入门友好，教育资源丰富。Domain Authority 经典指标。适合小企业与初学者。</div>
+    <div class="note"><strong>Majestic</strong>链接智能专注。Trust Flow / Citation Flow。适合深度外链审计与历史分析。</div>
+    <div class="note"><strong>Google Search Console</strong>免费官方数据。自身链接与索引的权威来源，作为第三方工具的验证基准。</div>
+  </div>
+
+  <div class="card">
+    <h2>功能对比矩阵</h2>
+    <table>
+      <tr><th>功能</th><th>Ahrefs</th><th>Semrush</th><th>Moz</th><th>Majestic</th><th>GSC</th></tr>
+      <tr><td class="cat">外链索引</td><td>强（~35T）</td><td>强（~43T）</td><td>中</td><td>强（历史深）</td><td>自身</td></tr>
+      <tr><td>Link Intersect / 差距</td><td>优秀</td><td>优秀</td><td>有</td><td>有</td><td>无</td></tr>
+      <tr><td>权威指标</td><td>DR</td><td>AS</td><td>DA</td><td>TF/CF</td><td>无</td></tr>
+      <tr><td>关键词研究</td><td>强</td><td>强</td><td>中</td><td>弱</td><td>有限</td></tr>
+      <tr><td>排名追踪</td><td>周更</td><td>日更</td><td>周更</td><td>无</td><td>有</td></tr>
+      <tr><td>站点审计</td><td>有</td><td>有</td><td>有</td><td>无</td><td>有限</td></tr>
+      <tr><td>PPC 研究</td><td>有限</td><td>强</td><td>无</td><td>无</td><td>无</td></tr>
+      <tr><td>AI 可见度</td><td>Brand Radar</td><td>内置</td><td>有</td><td>无</td><td>有限</td></tr>
+      <tr><td>内容优化</td><td>有</td><td>强</td><td>有</td><td>无</td><td>无</td></tr>
+    </table>
+    <p class="muted">索引规模为厂商宣称，实际覆盖因爬虫策略而异。GSC 是自身数据的权威来源。</p>
+  </div>
+
+  <div class="card">
+    <h2>选择建议</h2>
+    <table>
+      <tr><th>场景</th><th>推荐</th><th>原因</th></tr>
+      <tr><td>外链建设 / 竞品差距</td><td>Ahrefs</td><td>Link Intersect 与断链报告最实用</td></tr>
+      <tr><td>一站式营销团队</td><td>Semrush</td><td>SEO + PPC + 内容 + AI 可见度集成</td></tr>
+      <tr><td>小企业 / 入门</td><td>Moz</td><td>学习曲线低，价格友好</td></tr>
+      <tr><td>深度外链审计</td><td>Majestic</td><td>TF/CF 与历史数据独特</td></tr>
+      <tr><td>自身数据验证</td><td>GSC</td><td>官方数据，免费且权威</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>与自动化工作流集成</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>SEOWorkflowReAct 已集成 tool_select 工具：根据任务推荐外部工具。</li>
+      <li>工作流序列：研究 → 竞品差距 → 工具选择 → 质量评分 → 验证。</li>
+      <li>工具选择输出推荐与理由，实际数据导出仍需人工操作。</li>
+      <li>本系统专注流程模拟与评分，不替代商业工具的数据索引。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>价格参考（2026，月付）</h2>
+    <table>
+      <tr><th>工具</th><th>入门计划</th><th>实用计划</th><th>备注</th></tr>
+      <tr><td>Ahrefs</td><td>$29 Starter / $129 Lite</td><td>$249 Standard</td><td>外链研究强</td></tr>
+      <tr><td>Semrush</td><td>$139 SEO</td><td>$199+ Starter</td><td>含 AI 可见度</td></tr>
+      <tr><td>Moz</td><td>$49 Starter</td><td>$99 Standard</td><td>入门友好</td></tr>
+      <tr><td>Majestic</td><td>$49.99 Lite</td><td>$99.99 Pro</td><td>链接专注</td></tr>
+    </table>
+    <p class="muted">价格会变动，购买前以官网为准。多数工具提供年付折扣。</p>
+  </div>
+
+  <div class="card">
+    <p class="muted">市面 SEO 工具各有侧重：Ahrefs 擅长外链研究，Semrush 覆盖全栈营销，Moz 适合入门，Majestic 专注链接智能。选择取决于核心工作流，而非单一「最强」工具。本系统提供研究与评分流程模拟，实际数据仍依赖专业工具或 GSC。</p>
+  </div>
+</div>
+{% endblock %}

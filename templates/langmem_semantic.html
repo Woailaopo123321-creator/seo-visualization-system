@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}LangMem 语义提取{% endblock %}
+{% block heading %}LangMem 语义提取{% endblock %}
+{% block related %}<a href="/langchain-memory">记忆模块</a><a href="/langgraph-state">状态管理</a><a href="/langgraph">LangGraph</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.extract { border-left-color: #059669; }
+.path { border-left-color: #7c3aed; }
+.schema { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心机制</h2>
+    <div class="note extract"><strong>提取模式</strong>每次操作接收对话与当前记忆，提示 LLM 决定如何扩展或合并，返回更新后的记忆状态。每条记忆有 UUID，支持后续更新。</div>
+    <div class="note extract"><strong>create_memory_manager</strong>核心提取器。可配置 schema、指令、是否允许插入/删除。使用并行工具调用提取新记忆、更新旧记忆。</div>
+    <div class="note extract"><strong>Store Manager</strong>create_memory_store_manager 直接与 BaseStore 集成：搜索相关记忆 → 提取更新 → 写回存储。</div>
+  </div>
+
+  <div class="card">
+    <h2>两条路径</h2>
+    <div class="grid-2">
+      <div class="note path"><strong>热路径（Hot Path）</strong>智能体在对话中主动调用 manage_memory / search_memory 工具。简单但增加延迟与决策负担。</div>
+      <div class="note path"><strong>后台路径（Background）</strong>对话结束后由 ReflectionExecutor 异步提取。不阻塞回复。支持延迟与去重（新提交替换等待中的任务）。</div>
+    </div>
+    <div class="note"><strong>推荐</strong>后台路径更适合生产：提取不干扰用户体验，且可在对话安静后批量处理。</div>
+  </div>
+
+  <div class="card">
+    <h2>语义记忆 Schema</h2>
+    <div class="note schema"><strong>三元组（Triple）</strong>subject / predicate / object / context。适合关系事实（Alice manages ML_team）。上下文避免歧义。</div>
+    <div class="note schema"><strong>自由文本</strong>无 schema 时提取自然语言事实。适合偏好与一般知识。</div>
+    <div class="note schema"><strong>多类型</strong>可同时配置多个 schema（Triple + Preference + Relationship），各自独立提取规则。</div>
+  </div>
+
+  <div class="card">
+    <h2>命名空间隔离</h2>
+    <div class="note"><strong>模板变量</strong>namespace 支持 {user_id}、{org_id} 等占位符，运行时从 config 填充。</div>
+    <div class="note"><strong>常见模式</strong>按用户（memories, user_id）、按组织（memories, org_id）、按用户+组织、按类型（memories, user_id, preferences）。</div>
+    <div class="note"><strong>检索</strong>Store 支持向量搜索。相关性结合相似度、重要性与使用频率。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>当前系统无跨会话记忆。可评估引入后台提取机制。</li>
+      <li>SEO 工作流可提取用户偏好（主题优先级、发布节奏）作为长期记忆。</li>
+      <li>命名空间可按项目或站点隔离，避免不同任务间污染。</li>
+      <li>后台路径适合不阻塞 ReAct 循环的异步知识沉淀。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">LangMem 语义提取的核心是 LLM 驱动的记忆合并：接收对话与现有记忆，返回更新后的事实集合。后台路径避免阻塞，命名空间保证隔离。</p>
+  </div>
+</div>
+{% endblock %}

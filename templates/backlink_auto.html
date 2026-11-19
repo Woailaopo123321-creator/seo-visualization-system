@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}外链自动化 · 风险与边界{% endblock %}
+{% block heading %}外链自动化 · 风险与边界{% endblock %}
+{% block related %}<a href="/backlink">外链策略</a><a href="/eeat">E-E-A-T</a><a href="/agent-security">安全协议</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.risk { border-left-color: #dc2626; }
+.safe { border-left-color: #059669; }
+.gray { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>Google 政策边界</h2>
+    <div class="note risk"><strong>自动发布</strong>Google 垃圾政策明确列出「使用自动化程序或服务创建链接到你的网站」为链接垃圾。SpamBrain 识别并抵消。</div>
+    <div class="note risk"><strong>规模化放置</strong>低质量目录、自动评论、链接农场。即使未被手动处罚，链接通常被忽略，不传递价值。</div>
+    <div class="note"><strong>关键区分</strong>自动化研究与草稿（人发送）不在禁止列表；自动化放置（系统直接创建链接）在禁止列表。</div>
+  </div>
+
+  <div class="card">
+    <h2>三类自动化</h2>
+    <div class="grid-2">
+      <div class="note risk"><strong>发布器（高风险）</strong>自动提交目录、自动发帖、自动评论。直接创建链接。违反政策，价值通常被抵消。</div>
+      <div class="note gray"><strong>抓取器（中风险）</strong>自动发现目标站点。研究用途可接受，但自动提交则越界。需人工审核目标质量。</div>
+      <div class="note safe"><strong>验证器（安全）</strong>监控已有链接是否存活、是否被移除、锚文本是否变化。不创建链接，仅观察。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>合法自动化场景</h2>
+    <div class="note safe"><strong>链接监控</strong>定期检查已获得的链接是否仍存在、follow 状态、锚文本。发现丢失及时通知。</div>
+    <div class="note safe"><strong>提及发现</strong>扫描品牌提及，识别未链接的提及，供人工跟进回收。</div>
+    <div class="note safe"><strong>外链审计</strong>分析现有链接分布、锚文本多样性、来源相关性。辅助决策，不自动操作。</div>
+    <div class="note safe"><strong>目标研究</strong>识别相关站点、联系人、内容类型。生成列表供人工审核与外展。</div>
+  </div>
+
+  <div class="card">
+    <h2>风险后果</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>SpamBrain 抵消不自然链接，价值不恢复。</li>
+      <li>手动处罚少见但存在，需 Search Console 申请复议。</li>
+      <li>2026 垃圾更新聚焦规模化内容，但链接政策持续执行。</li>
+      <li>第三方「毒性分数」不等于 Google 判断，多数站点无需 disavow。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>可增加链接监控与提及发现工具，不实现自动发布。</li>
+      <li>HITL 闸门适用于任何外展决策，避免自动放置。</li>
+      <li>记忆提取可沉淀「已验证链接来源」与「目标站点质量评估」。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">自动发布外链违反 Google 政策，价值通常被抵消。合法自动化限于监控、验证、研究与草稿，最终放置需人工确认。</p>
+  </div>
+</div>
+{% endblock %}

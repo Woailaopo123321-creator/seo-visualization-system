@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Decay Monitoring · 引用衰减机制{% endblock %}
+{% block heading %}Decay Monitoring{% endblock %}
+{% block related %}<a href="/crasp-vs-cited">CRASP vs CITED</a><a href="/citation">引用追踪</a><a href="/seo-workflow">工作流</a><a href="/passage">段落架构</a>{% endblock %}
+{% block head %}
+<style>
+.hl { font-size: 28px; font-weight: 700; color: var(--danger); }
+.bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 4px 0; }
+.bar-fill { height: 100%; background: #10b981; }
+.platform { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.cadence { background: var(--tint-green); border-left: 3px solid #10b981; padding: 10px; margin: 8px 0; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心事实</h2>
+    <p class="hl">11 天</p>
+    <p>Profound 研究（88.3 万页面 × 7 引擎）：典型页面在峰值后 11 天内失去一半引用份额。78% 的被引用页面在两周内跌至峰值一半。</p>
+    <p class="muted">Scrunch × Stacker（350 万事件）：中位半衰期约 4.5 周。AI 引用是消耗品，而非可积累资产。</p>
+  </div>
+
+  <div class="card">
+    <h2>平台半衰期差异</h2>
+    <div class="platform"><span>ChatGPT</span><span>3.4 周（最快）</span></div>
+    <div class="bar"><div class="bar-fill" style="width:34%"></div></div>
+    <div class="platform"><span>Google AI Mode</span><span>4.3 周</span></div>
+    <div class="bar"><div class="bar-fill" style="width:43%"></div></div>
+    <div class="platform"><span>Google AI Overviews</span><span>4.7 周</span></div>
+    <div class="bar"><div class="bar-fill" style="width:47%"></div></div>
+    <div class="platform"><span>Gemini</span><span>4.8 周</span></div>
+    <div class="bar"><div class="bar-fill" style="width:48%"></div></div>
+    <div class="platform"><span>Perplexity</span><span>5.8 周（最慢）</span></div>
+    <div class="bar"><div class="bar-fill" style="width:58%"></div></div>
+    <p class="muted" style="margin-top:8px;">引擎间几乎不相关（相关系数 0.03–0.09）。一个引擎衰减不代表另一个也衰减。</p>
+  </div>
+
+  <div class="card">
+    <h2>监测节奏（4-Cadence 模型）</h2>
+    <div class="cadence"><strong>每日</strong>：自动检查爬虫访问与引用突变（Daily Pulse）</div>
+    <div class="cadence"><strong>每周</strong>：优先页面人工审查，标记需刷新内容（Working Review）</div>
+    <div class="cadence"><strong>每月</strong>：趋势报告、引用份额、跨引擎覆盖（Stakeholder Report）</div>
+    <div class="cadence"><strong>每季</strong>：重审提示词集、竞品基准、工具与预算（Strategic Reset）</div>
+  </div>
+
+  <div class="card">
+    <h2>刷新原则</h2>
+    <p>1. <strong>实质更新</strong>：新增数据、更新统计、更锐利的答案块、新 FAQ。仅改日期无效。</p>
+    <p>2. <strong>平台匹配</strong>：ChatGPT 优先页面每 2–3 周；Google 表面每月；Perplexity 可至 6 周。</p>
+    <p>3. <strong>日期诚实</strong>：可见日期与 schema（datePublished / dateModified）必须匹配。</p>
+    <p>4. <strong>分布式更持久</strong>：网络分发内容半衰期约为自有域名的 2 倍。</p>
+    <p>5. <strong>测量闭环</strong>：刷新后用同一提示词集重新测量，比较前后引用率而非单次快照。</p>
+  </div>
+
+  <div class="card">
+    <h2>与系统集成</h2>
+    <p>• 工作流 Agent 的 <code>citation_monitor</code> 步骤已可记录引用变化。</p>
+    <p>• 建议在 <a href="/citation">/citation</a> 页面增加半衰期预警与刷新建议。</p>
+    <p>• 优先页面可按引擎设定不同刷新阈值，并在 Kanban 中标记「需刷新」状态。</p>
+  </div>
+</div>
+{% endblock %}

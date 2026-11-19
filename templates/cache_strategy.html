@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}分布式缓存策略 · 多智能体{% endblock %}
+{% block heading %}分布式缓存策略{% endblock %}
+{% block related %}<a href="/multi-agent">Agent架构</a><a href="/seo-workflow">工作流</a><a href="/dl-seo">DL评分</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.layer { border-left: 4px solid #4f46e5; padding: 10px 14px; margin: 8px 0; background: var(--surface); border-radius: 0 8px 8px 0; }
+.layer h3 { margin: 0 0 4px; font-size: 15px; }
+.strategy { display: grid; grid-template-columns: 140px 1fr 120px; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.strategy:last-child { border-bottom: none; }
+.tag { font-size: 12px; padding: 2px 8px; border-radius: 12px; background: var(--tint-indigo); color: var(--ink-indigo); }
+.risk { color: var(--warn); }
+.ok { color: var(--ok); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>当前系统状态</h2>
+    <p class="muted">Coordinator 使用进程内 TTL 缓存（30秒），基于任务哈希精确匹配。适合单进程模拟，但无法跨实例共享，也不处理语义相似请求。</p>
+  </div>
+
+  <div class="card">
+    <h2>四层分布式缓存模型</h2>
+    <div class="layer">
+      <h3>1. 应用内内存缓存（当前实现）</h3>
+      极低延迟、零网络开销。适合热路径重复调用。TTL 失效，无主动失效。
+    </div>
+    <div class="layer">
+      <h3>2. 共享键值层（Redis / Valkey）</h3>
+      跨进程、跨实例共享。支持 Pub/Sub 失效广播、分布式锁防缓存击穿。适合 Agent 中间结果与工具输出。
+    </div>
+    <div class="layer">
+      <h3>3. 语义 / 向量缓存</h3>
+      对相似查询（而非精确匹配）返回缓存结果。使用嵌入相似度阈值（通常 0.85–0.95）。显著提升 ReAct 循环中重复意图的命中率。
+    </div>
+    <div class="layer">
+      <h3>4. Agent 感知 KV / 前缀缓存</h3>
+      针对 LLM 调用的 KV Cache 管理。分支计数（live branch counting）优先保留仍被活跃 Agent 分支引用的块，优于纯 LRU。研究显示可降低 P95 TTFT 最高 14x。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>失效策略对比</h2>
+    <div class="strategy"><strong>TTL 失效</strong><span>简单可靠，无协调开销</span><span class="tag">当前使用</span></div>
+    <div class="strategy"><strong>事件驱动失效</strong><span>写操作后 Pub/Sub 广播失效</span><span class="tag">推荐</span></div>
+    <div class="strategy"><strong>版本戳 / 快照键</strong><span>策略或数据变更时自动 miss</span><span class="ok">强一致性</span></div>
+    <div class="strategy"><strong>依赖图失效</strong><span>工具写操作触发相关读缓存失效</span><span class="risk">复杂度高</span></div>
+    <div class="strategy"><strong>工作负载感知淘汰</strong><span>综合重计算成本、依赖数、调用频率</span><span class="ok">研究验证</span></div>
+  </div>
+
+  <div class="card">
+    <h2>针对本系统的优化建议</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>短期</strong>：为 citation_score、passage_audit 等高频工具结果增加更长 TTL，并区分可缓存与不可缓存工具。</li>
+      <li><strong>中期</strong>：引入 Redis 共享层，支持多实例部署与跨请求共享。</li>
+      <li><strong>长期</strong>：对 SEO 学习路径与引用评分加入语义缓存；对 ReAct 轨迹应用分支感知保留策略。</li>
+      <li><strong>失效</strong>：人工闸门确认后主动清除相关缓存；数据更新时使用版本戳。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>研究要点</h2>
+    <p class="muted">Workload-Aware Caching 研究显示，结合重计算成本与依赖计数的淘汰策略可比标准 LRU 降低延迟最高 64.7%。<grok type="render_inline_citation" citation_id="542" /></p>
+    <p class="muted">Agent-aware KV 管理（分支计数）在真实轨迹上可实现最高 14x 的 P95 TTFT 改善。<grok type="render_inline_citation" citation_id="546" /></p>
+  </div>
+</div>
+{% endblock %}

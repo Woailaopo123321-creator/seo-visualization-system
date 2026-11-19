@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}学习可视化 · 进度看板{% endblock %}
+{% block heading %}学习看板{% endblock %}
+{% block related %}<a href="/dashboard">仪表盘</a><a href="/overview">总览</a><a href="/seo-workflow">工作流</a><a href="/dl-seo">DL评分</a><a href="/multi-agent">协作</a><a href="/cache-strategy">缓存</a>{% endblock %}
+{% block head %}
+<style>
+.kanban { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; min-height: 460px; }
+.kanban > .state { flex: 1; }
+.column { background: var(--surface-2); border-radius: 8px; min-width: 240px; flex: 1; padding: 10px; }
+.column h2 { font-size: 13px; padding: 6px 8px; border-radius: 6px; color: white; margin-bottom: 8px; }
+.todo h2 { background: #2563eb; }
+.in_progress h2 { background: #b45309; }
+.done h2 { background: #047857; }
+.review h2 { background: #7e22ce; }
+.task-actions { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.task-actions button { padding: 0 10px; min-width: 36px; min-height: 32px; font-size: 13px; background: var(--tint-indigo); color: var(--accent); }
+.task-actions .del { margin-left: auto; background: var(--tint-red); color: var(--danger); }
+@media (pointer: coarse), (max-width: 640px) { .task-actions button { min-width: 44px; min-height: 44px; } }
+.card-item.saving { opacity: .6; }
+.column .state { padding: 14px 6px; font-size: 13px; }
+@media (max-width: 640px) {
+.column { min-width: 200px; }
+}
+.card-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 14px; }
+.stats { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; min-height: 68px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; min-width: 100px; }
+.stat .num { font-size: 20px; font-weight: 600; color: var(--accent); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="stats" id="stats"></div>
+  <form class="card row" id="add-form" autocomplete="off">
+    <input id="new-title" maxlength="80" placeholder="新任务标题，例如：主题集群规划" aria-label="新任务标题" required style="flex:2;min-width:180px">
+    <input id="new-subtitle" maxlength="200" placeholder="备注（可选）" aria-label="备注" style="flex:2;min-width:140px">
+    <select id="new-priority" aria-label="优先级"><option value="high">高优先级</option><option value="medium" selected>中优先级</option><option value="low">低优先级</option></select>
+    <button type="submit">+ 添加任务</button>
+  </form>
+  <div class="kanban" id="kanban" aria-live="polite"></div>
+  <p class="muted" style="margin-top:8px">提示：用卡片上的 ◀ ▶ 移动阶段，滑块调整进度，✕ 删除。数据保存在服务器 data/learning_data.json。</p>
+</div>
+<script>
+const COLS = {todo:"待规划", in_progress:"进行中", review:"待优化", done:"已完成"};
+const ORDER = Object.keys(COLS);
+const PRI = {high:"高", medium:"中", low:"低"};
+let tasks = [];
+function showError(prefix, e) { SEO.toast(`${prefix}：${e.message || e}`, "error"); }
+function render() {
+  // 重新渲染会替换 DOM：记住当前焦点（任务 + 操作），渲染后还原，键盘用户不会丢失位置
+  const f = document.activeElement && document.activeElement.closest(".card-item[data-id]");
+  const focusKey = f ? [f.dataset.id, document.activeElement.dataset.act] : null;
+  const esc = SEO.escapeHtml;
+  const counts = Object.fromEntries(ORDER.map(k => [k, 0]));
+  tasks.forEach(t => counts[t.status] = (counts[t.status] || 0) + 1);
+  const avg = tasks.length ? Math.round(tasks.reduce((s, t) => s + (t.progress || 0), 0) / tasks.length) : 0;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><div class="num">${tasks.length}</div><div class="muted">总任务</div></div>
+    ${ORDER.map(k => `<div class="stat"><div class="num">${counts[k]}</div><div class="muted">${COLS[k]}</div></div>`).join("")}
+    <div class="stat"><div class="num">${avg}%</div><div class="muted">平均进度</div></div>`;
+  document.getElementById("kanban").innerHTML = ORDER.map((k, i) => `
+    <div class="column ${k}"><h2>${COLS[k]} · ${counts[k]}</h2>
+      ${tasks.filter(t => t.status === k).map(t => `
+        <div class="card-item" data-id="${t.id}">
+          <div style="display:flex;justify-content:space-between;gap:6px"><strong>${esc(t.title)}</strong>
+            <span class="muted" title="优先级">${PRI[t.priority] || "中"}</span></div>
+          <div class="muted">${esc(t.subtitle || "")}</div>
+          <input type="range" min="0" max="100" step="5" value="${t.progress || 0}" data-act="progress" aria-label="「${esc(t.title)}」进度" aria-valuetext="${t.progress || 0}%" style="width:100%;padding:0;margin-top:6px">
+          <div class="task-actions">
+            <button type="button" data-act="prev" ${i === 0 ? "disabled" : ""} title="移到上一阶段" aria-label="把「${esc(t.title)}」移到上一阶段">◀</button>
+            <span class="muted">${t.progress || 0}%</span>
+            <button type="button" data-act="next" ${i === ORDER.length - 1 ? "disabled" : ""} title="移到下一阶段" aria-label="把「${esc(t.title)}」移到下一阶段">▶</button>
+            <button type="button" data-act="del" class="del" title="删除" aria-label="删除「${esc(t.title)}」">✕</button>
+          </div>
+        </div>`).join("") || '<div class="state"><span>暂无任务</span></div>'}
+    </div>`).join("");
+  if (focusKey) {
+    const el = document.querySelector(`.card-item[data-id="${focusKey[0]}"] [data-act="${focusKey[1]}"]`);
+    if (el && !el.disabled) el.focus();
+  }
+}
+async function load() {
+  SEO.loading("kanban", "正在加载任务…");
+  try { tasks = await SEO.request("/api/tasks"); SEO.done("kanban"); render(); }
+  catch (e) { SEO.failed("kanban", e, load); }
+}
+async function update(id, patch, okMsg) {
+  const card = document.querySelector(`.card-item[data-id="${id}"]`);
+  if (card) card.classList.add("saving");
+  try {
+    const t = await SEO.request(`/api/tasks/${id}`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify(patch)});
+    tasks = tasks.map(x => x.id === id ? t : x); render();
+    if (okMsg) SEO.toast(okMsg(t), "ok");
+  } catch (e) { if (card) card.classList.remove("saving"); render(); showError("更新失败", e); }
+}
+document.getElementById("kanban").addEventListener("click", async ev => {
+  const btn = ev.target.closest("button[data-act]"); if (!btn) return;
+  const id = Number(btn.closest(".card-item").dataset.id);
+  const t = tasks.find(x => x.id === id); const i = ORDER.indexOf(t.status);
+  const moved = x => `「${x.title}」已移到「${COLS[x.status]}」`;
+  if (btn.dataset.act === "prev") update(id, {status: ORDER[i - 1]}, moved);
+  if (btn.dataset.act === "next") update(id, {status: ORDER[i + 1]}, moved);
+  if (btn.dataset.act === "del" && confirm(`删除任务「${t.title}」？此操作不能撤销。`)) {
+    try {
+      await SEO.request(`/api/tasks/${id}`, {method: "DELETE"});
+      tasks = tasks.filter(x => x.id !== id); render(); SEO.toast(`已删除「${t.title}」`, "ok");
+    } catch (e) { showError("删除失败", e); }
+  }
+});
+document.getElementById("kanban").addEventListener("change", ev => {
+  if (ev.target.dataset.act !== "progress") return;
+  update(Number(ev.target.closest(".card-item").dataset.id), {progress: Number(ev.target.value)});
+});
+document.getElementById("add-form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const title = document.getElementById("new-title");
+  await SEO.withButton(ev.target.querySelector("button"), async () => {
+    try {
+      const t = await SEO.postJSON("/api/tasks", {title: title.value, subtitle: document.getElementById("new-subtitle").value, priority: document.getElementById("new-priority").value});
+      tasks.push(t); render(); ev.target.reset(); title.focus();
+      SEO.toast(`已添加「${t.title}」到「${COLS[t.status]}」`, "ok");
+    } catch (e) { showError("添加失败", e); }
+  }, "添加中…");
+});
+document.addEventListener("DOMContentLoaded", load);
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}深度学习优化 · AI 自动化{% endblock %}
+{% block heading %}深度学习优化 · AI 自动化{% endblock %}
+{% block related %}<a href="/overview">总览</a><a href="/multi-agent">协作</a><a href="/seo-workflow">工作流</a><a href="/dl-seo">DL评分</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.level { border-left: 4px solid #4f46e5; padding: 10px 14px; margin: 8px 0; background: var(--surface); }
+.level strong { color: var(--text); }
+.risk { border-left: 4px solid #dc2626; }
+.safe { border-left: 4px solid #059669; }
+.dl { border-left: 4px solid #7c3aed; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) {
+.grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>多智能体协作模式（来自上传图）</h2>
+    <div class="level"><strong>1. 层次编排器（Hierarchical Orchestrator）</strong>自上而下分解任务，适合复杂长流程。本系统 Coordinator 对应此模式。</div>
+    <div class="level"><strong>2. 顺序流水线（Sequential Pipeline）</strong>单向传递，逐阶段处理。SEO 工作流 8 阶段即此模式。</div>
+    <div class="level"><strong>3. 并行扇出（Parallel Fan-out）</strong>同时处理独立子任务，提升效率。引用评分与多源审计可并行。</div>
+    <div class="level"><strong>4. 共享黑板（Shared Blackboard）</strong>松耦合信息共享。当前缓存层可扩展为黑板。</div>
+  </div>
+
+  <div class="card">
+    <h2>Agent 安全对齐框架 2026</h2>
+    <div class="grid-2">
+      <div>
+        <div class="level safe"><strong>自治层级</strong>工具级 → 脚本级 → 代理级 → 组织级 → 自治级。能力越高，对齐要求越高。</div>
+        <div class="level safe"><strong>外部控制层</strong>权限控制 · 人工介入关卡（HITL）· 紧急关闭开关 · 审计与可追溯。</div>
+      </div>
+      <div>
+        <div class="level risk"><strong>委派失准风险</strong>目标偏移 · 规范漂移 · 责任模糊 · 级联失效。需建立委派策略与对齐契约。</div>
+        <div class="level safe"><strong>本系统落地</strong>ReAct 步骤预算 + 重复动作检测 = 基础 Kill Switch；人工闸门 = HITL。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>深度学习优化方向</h2>
+    <div class="level dl"><strong>引用概率评分（已集成）</strong>基于 Athena ACE / GEO-16 特征的加权模型，阈值 0.73。可进一步用 RL 优化权重。</div>
+    <div class="level dl"><strong>贡献感知信用分配</strong>LEAD-RL 风格：对子 Agent 报告按研究效用分配优势，避免误导性报告获得奖励。</div>
+    <div class="level dl"><strong>元认知策略优化</strong>HILA 框架：Agent 评估置信度与任务难度，必要时延缓至人工（Strategic Deferral）。</div>
+    <div class="level dl"><strong>安全对齐联合训练</strong>WALTZRL：对话 Agent 与反馈 Agent 协作，降低不安全响应与过度拒绝。</div>
+  </div>
+
+  <div class="card">
+    <h2>AI 自动化工作流优化建议</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>编排层</strong>：保持 Coordinator 作为层次编排器，增加安全规范发布步骤。</li>
+      <li><strong>执行层</strong>：专用 Agent 保持单一职责，输出结构化报告供信用分配。</li>
+      <li><strong>控制层</strong>：关键发布路径强制 HITL；异常时触发 Kill Switch（步骤预算耗尽）。</li>
+      <li><strong>学习层</strong>：收集轨迹，用贡献感知 RL 优化任务分解与子任务质量。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">整合自上传的多智能体协作机制图与 Agent 安全对齐框架 2026。深度学习优化聚焦于信用分配、元认知延缓与安全联合训练。</p>
+  </div>
+</div>
+{% endblock %}

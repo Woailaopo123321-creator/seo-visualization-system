@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}深度学习引用评分 · SEO 自动化{% endblock %}
+{% block heading %}深度学习引用评分{% endblock %}
+{% block related %}<a href="/seo-workflow">工作流</a><a href="/citation">引用追踪</a><a href="/crasp">CRASP</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.feature-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.bar { height: 8px; background: var(--border); border-radius: 4px; flex: 1; margin: 0 12px; overflow: hidden; }
+.bar-fill { height: 100%; background: #4f46e5; }
+.score-big { font-size: 48px; font-weight: 700; color: var(--accent); text-align: center; }
+.threshold { color: var(--warn); font-size: 13px; text-align: center; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) {
+.grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>引用概率评分模型</h2>
+    <p class="muted">基于 Athena Citation Engine 验证逻辑 + GEO-16 特征工程。评分范围 0–1，≥0.73 对应真实引用率显著跃升。</p>
+    <div class="score-big" id="score">0.78</div>
+    <div class="threshold">阈值 0.73 · 高引用概率</div>
+  </div>
+
+  <div class="card">
+    <h2>特征权重（可解释评分）</h2>
+    <div id="features"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>优化建议</h2>
+      <ul style="font-size:14px; padding-left:18px;">
+        <li>补强 40–60 字直接答案（权重最高）</li>
+        <li>每页至少 1 个带源原创数字</li>
+        <li>强化作者实体 + sameAs</li>
+        <li>保持更新时间信号新鲜</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>研究依据</h2>
+      <p class="muted">Athena 对 1,761 篇文章验证：顶十分位引用率 87%，底十分位 38.6%，评分与引用率相关 R²=0.81。<grok type="render_inline_citation" citation_id="498" /></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <button onclick="rescore()">重新评分（模拟）</button>
+    <div class="log" id="log" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<script>
+const features = [
+  {name: "Answer-First 直接答案", weight: 0.22, value: 0.85},
+  {name: "Fact Density 事实密度", weight: 0.20, value: 0.72},
+  {name: "Structure 结构", weight: 0.15, value: 0.90},
+  {name: "Entity Clarity 实体清晰度", weight: 0.12, value: 0.65},
+  {name: "Freshness 新鲜度", weight: 0.12, value: 0.80},
+  {name: "Source Authority 来源权威", weight: 0.10, value: 0.70},
+  {name: "Specificity 精确性", weight: 0.09, value: 0.88}
+];
+
+function render() {
+  const container = document.getElementById("features");
+  container.innerHTML = features.map(f => `
+    <div class="feature-row">
+      <span>${f.name} <small>(${(f.weight*100).toFixed(0)}%)</small></span>
+      <div class="bar"><div class="bar-fill" style="width:${f.value*100}%"></div></div>
+      <span>${f.value.toFixed(2)}</span>
+    </div>
+  `).join("");
+  const score = features.reduce((s, f) => s + f.value * f.weight, 0);
+  document.getElementById("score").textContent = score.toFixed(2);
+}
+
+function rescore() {
+  features.forEach(f => f.value = Math.max(0.4, Math.min(0.98, f.value + (Math.random()-0.5)*0.15)));
+  render();
+  document.getElementById("log").textContent = "已重新采样特征并计算加权得分。";
+}
+
+render();
+</script>
+{% endblock %}

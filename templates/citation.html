@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}AI 引用追踪{% endblock %}
+{% block heading %}AI 引用追踪{% endblock %}
+{% block related %}<a href="/aeo-geo">AEO/GEO</a><a href="/seo-deep">深度洞察</a><a href="/passage">段落架构</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.metric { text-align: center; }
+.metric .num { font-size: 28px; font-weight: 600; color: var(--accent); }
+.source { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+.owned { background: #10b981; }
+.comp { background: #f59e0b; }
+.third { background: #64748b; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); margin-bottom:12px;">
+    <div class="card metric"><div class="num">42%</div><div class="muted">引用率</div></div>
+    <div class="card metric"><div class="num">3/5</div><div class="muted">引擎覆盖</div></div>
+    <div class="card metric"><div class="num">18</div><div class="muted">活跃引用页</div></div>
+    <div class="card metric"><div class="num">61%</div><div class="muted">Ghost 引用</div></div>
+  </div>
+
+  <div class="card">
+    <h2>来源分类（示例提示词面板）</h2>
+    <div class="source">
+      <span>自有页面</span>
+      <span>18%<span class="tag" style="background:var(--tint-green);color:var(--ink-green);">owned</span></span>
+    </div>
+    <div class="bar"><div class="bar-fill owned" style="width:18%"></div></div>
+    <div class="source">
+      <span>竞品页面</span>
+      <span>31%<span class="tag" style="background:var(--tint-amber);color:var(--ink-amber);">competitor</span></span>
+    </div>
+    <div class="bar"><div class="bar-fill comp" style="width:31%"></div></div>
+    <div class="source">
+      <span>第三方 / 社区</span>
+      <span>51%<span class="tag" style="background:var(--surface-2);color:var(--muted);">third-party</span></span>
+    </div>
+    <div class="bar"><div class="bar-fill third" style="width:51%"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>2026 追踪要点</h2>
+    <p class="muted">• 必须看到<strong>具体 URL</strong>，而非仅品牌提及或域名。</p>
+    <p class="muted">• 固定提示词面板（15–50 个买家问题），多次采样后计算引用率。</p>
+    <p class="muted">• 区分 citation（被引用）与 mention（被提及）；约 60%+ 为 ghost citation。</p>
+    <p class="muted">• Search Console 提供 AI Overview/AI Mode 曝光；Bing 可看 Copilot 引用。</p>
+    <p class="muted">• 每周对比：哪些来源新增/丢失，竞品被引用而本站未被引用的缺口。</p>
+  </div>
+
+  <div class="card">
+    <h2>优先行动</h2>
+    <p>1. 建立固定提示词面板并记录基线</p>
+    <p>2. 找出被竞品引用的第三方页面（比较/最佳列表）</p>
+    <p>3. 强化自有页面的可提取段落 + 原创数据</p>
+    <p>4. 争取高权重第三方提及（比单纯自有 schema 更有效）</p>
+  </div>
+</div>
+{% endblock %}

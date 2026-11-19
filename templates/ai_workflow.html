@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}AI 自动化工作流{% endblock %}
+{% block heading %}AI 自动化工作流{% endblock %}
+{% block related %}<a href="/seo-workflow">SEO 工作流</a><a href="/multi-agent">协作模式</a><a href="/agent-security">安全协议</a><a href="/dl-automation">DL 自动化</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.pattern { border-left-color: #7c3aed; }
+.hitl { border-left-color: #059669; }
+.tier { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info">✅ HITL 已在本系统真正落地：<a href="/workflow-runs">工作流审批台</a>。</div>
+  <div class="card">
+    <h2>编排模式</h2>
+    <div class="grid-2">
+      <div class="note pattern"><strong>顺序管道</strong>固定线性步骤，易于追踪。适合确定性流程。本系统 SEO 工作流采用此模式。</div>
+      <div class="note pattern"><strong>编排-工作者</strong>协调智能体分解任务并委派专家。适合多部分研究。本系统 Coordinator 采用此模式。</div>
+      <div class="note pattern"><strong>并行扇出</strong>独立子任务并行执行后合并。适合加速。查询扇出分析可并行化。</div>
+      <div class="note pattern"><strong>交接</strong>控制权在智能体间传递。适合跨领域任务。安全协议中有结构化交接。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>人工闸门（HITL）</h2>
+    <div class="note hitl"><strong>策略与简报</strong>人类定义受众、意图、独特角度与验收标准。AI 辅助分析 SERP 与缺口。</div>
+    <div class="note hitl"><strong>发布前审核</strong>事实核查、来源验证、品牌声音、E-E-A-T 信号。AI 生成内容需人工确认。</div>
+    <div class="note hitl"><strong>高风险声明</strong>法律、医疗、财务、定价相关内容需专家签核。自动失败条件：无来源统计。</div>
+    <div class="note"><strong>本系统实现</strong>工作流各阶段标记 human_gate；安全协议含 HITL 闸门与 Kill Switch。</div>
+  </div>
+
+  <div class="card">
+    <h2>四层自动化地图</h2>
+    <div class="note tier"><strong>Tier 1 · 监控</strong>智能体端到端负责（引用追踪、衰减监控）。人类每周查看异常。</div>
+    <div class="note tier"><strong>Tier 2 · 技术修复</strong>智能体提出并应用安全修复。结构性变更需人工批准。</div>
+    <div class="note tier"><strong>Tier 3 · 页面优化</strong>智能体起草变更（标题、内链、段落）。人工批量审核后发布。</div>
+    <div class="note tier"><strong>Tier 4 · 编辑判断</strong>人类拥有决策权：主题选择、角度、第一手经验。智能体仅辅助研究。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统映射</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>顺序 + 闸门</strong>：SEO 工作流 8 阶段，每阶段可标记人工确认。</li>
+      <li><strong>编排中心</strong>：Coordinator 调度专家智能体（研究、优化、发布）。</li>
+      <li><strong>安全层</strong>：HITL、Kill Switch、权限收窄已集成。</li>
+      <li><strong>可观测性</strong>：ReAct 轨迹日志、缓存、请求计时中间件。</li>
+      <li><strong>协议</strong>：可扩展 MCP（工具）与 A2A（智能体间）通信。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">AI 自动化工作流的核心是选择最简单有效的编排模式，并在关键决策点设置人工闸门。本系统已采用顺序管道 + 编排中心 + HITL 组合。</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,150 +1,107 @@
-"""ReAct 循环：Thought → Action → Observation。"""
+"""
+ReAct 推理模式实现（2026 优化版）
+Thought → Action → Observation 循环，完整轨迹记录。
+增强：重复动作检测、错误反馈、步数预算、可观测性。
+"""
 
-from __future__ import annotations
+import uuid
+from typing import Dict, Any, List, Callable
+from .base import BaseAgent
 
-from typing import Any, Callable
-
-ToolFunc = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
-
-
-class ReActAgent:
-    """按思考、行动、观察推进，直到结束或达到步数上限。
-
-    子类覆盖 :meth:`think`。工具缺失、返回值不合法或执行抛错时，
-    错误会写进观察，不会直接抛给调用方。
-    """
-
-    def __init__(self, name: str, max_steps: int = 10) -> None:
-        if not isinstance(name, str) or not name.strip():
-            raise ValueError("Agent 名称不能为空")
-        if isinstance(max_steps, bool) or not isinstance(max_steps, int) or max_steps < 1:
-            raise ValueError("max_steps 至少为 1")
-        self.name = name.strip()
+class ReActAgent(BaseAgent):
+    """支持 ReAct 循环的 Agent 基类"""
+    def __init__(self, name: str, max_steps: int = 8):
+        super().__init__(name)
         self.max_steps = max_steps
-        self.tools: dict[str, ToolFunc] = {}
+        self.tools: Dict[str, Callable] = {}
 
-    def register_tool(self, name: str, func: ToolFunc) -> None:
-        """注册一个工具。同名注册会覆盖旧工具。"""
+    def register_tool(self, name: str, func: Callable) -> None:
+        """注册 ReAct 工具（action 名 → 函数）"""
+        self.tools[name] = func
 
-        if not isinstance(name, str) or not name.strip():
-            raise ValueError("工具名称不能为空")
-        if not callable(func):
-            raise TypeError("工具必须可调用")
-        self.tools[name.strip()] = func
+    def think(self, context: Dict[str, Any], trajectory: List[Dict]) -> Dict[str, Any]:
+        """模拟思考：根据上下文决定下一步。子类可重写。"""
+        raise NotImplementedError
 
-    def think(self, context: dict[str, Any], trajectory: list[dict[str, Any]]) -> dict[str, Any]:
-        """决定下一步。
+    def _detect_repeat(self, trajectory: List[Dict], action_name: str) -> bool:
+        recent = [t for t in trajectory if t.get("type") == "action"][-2:]
+        return len(recent) >= 2 and all(t.get("tool") == action_name for t in recent)
 
-        返回 ``decision="finish"`` 和 ``answer`` 表示结束。
-        否则返回 ``action`` 与 ``action_input``。
-        """
-
-        return {
-            "decision": "finish",
-            "text": "没有更多动作",
-            "answer": {"summary": "done"},
-        }
-
-    def run(self, context: dict[str, Any] | None = None) -> dict[str, Any]:
-        """执行循环，返回是否完成、答案和完整轨迹。"""
-
-        ctx = self._copy_context(context)
-        trajectory: list[dict[str, Any]] = []
-        answer: dict[str, Any] = {"summary": "已达到最大步数"}
-        finished = False
+    def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Thought → Action → Observation 循环，直到给出答案或达到最大步数；返回答案与完整轨迹"""
+        trajectory = []
+        context = {"task": task, "observations": [], "errors": []}
+        final_answer = None
+        repeated = 0
 
         for step in range(1, self.max_steps + 1):
-            thought = self._safe_think(ctx, trajectory)
-            failed = bool(thought.get("error"))
-            thought_content: dict[str, Any] = {
-                "text": str(thought.get("text") or ""),
-                "decision": thought.get("decision"),
-            }
-            if failed:
-                thought_content["error"] = thought["error"]
-            trajectory.append(self._event(step, "thought", thought, thought_content))
+            # 1. Thought
+            thought = self.think(context, trajectory)
+            trajectory.append({
+                "step": step,
+                "type": "thought",
+                "content": thought.get("thought", ""),
+                "decision": thought.get("decision", "continue")
+            })
 
             if thought.get("decision") == "finish":
-                raw_answer = thought.get("answer") or {}
-                answer = raw_answer if isinstance(raw_answer, dict) else {"summary": str(raw_answer)}
-                finished = not failed
+                final_answer = thought.get("answer")
                 break
 
-            action_input = thought.get("action_input")
-            if not isinstance(action_input, dict):
-                action_input = {}
-            trajectory.append(
-                self._event(
-                    step,
-                    "action",
-                    thought,
-                    {"tool": thought.get("action"), "input": action_input},
-                )
-            )
-            trajectory.append(
-                self._event(
-                    step,
-                    "observation",
-                    thought,
-                    self._invoke(thought.get("action"), action_input, ctx),
-                )
-            )
-        else:
-            answer = {"summary": "已达到最大步数", "human_gate": "流程未完成，需人工接手"}
-            finished = False
+            # 2. Action
+            action_name = thought.get("action")
+            action_input = thought.get("action_input", {})
+
+            if self._detect_repeat(trajectory, action_name):
+                repeated += 1
+                observation = {"warning": "检测到重复动作，已跳过", "action": action_name}
+                trajectory.append({
+                    "step": step,
+                    "type": "observation",
+                    "content": observation
+                })
+                context["observations"].append(observation)
+                if repeated >= 2:
+                    final_answer = {"message": "重复动作过多，提前终止", "observations": context["observations"]}
+                    break
+                continue
+
+            trajectory.append({
+                "step": step,
+                "type": "action",
+                "tool": action_name,
+                "input": action_input
+            })
+
+            # 3. Observation
+            if action_name in self.tools:
+                try:
+                    observation = self.tools[action_name](action_input, context)
+                except Exception as e:
+                    observation = {"error": str(e), "recoverable": True}
+                    context["errors"].append(str(e))
+            else:
+                observation = {"error": f"工具 {action_name} 不存在", "recoverable": False}
+
+            trajectory.append({
+                "step": step,
+                "type": "observation",
+                "content": observation
+            })
+            context["observations"].append(observation)
+
+        if final_answer is None:
+            final_answer = {
+                "message": "达到最大步数，基于已有观察给出结果",
+                "observations": context["observations"],
+                "errors": context["errors"]
+            }
 
         return {
-            "agent": self.name,
-            "finished": finished,
-            "answer": answer,
+            "result": final_answer,
             "trajectory": trajectory,
-        }
-
-    def _copy_context(self, context: dict[str, Any] | None) -> dict[str, Any]:
-        if context is None:
-            return {}
-        if not isinstance(context, dict):
-            raise TypeError("context 必须是字典")
-        return dict(context)
-
-    def _safe_think(self, context: dict[str, Any], trajectory: list[dict[str, Any]]) -> dict[str, Any]:
-        try:
-            thought = self.think(context, trajectory)
-        except Exception as exc:
-            return {
-                "decision": "finish",
-                "text": "思考阶段出错",
-                "error": str(exc),
-                "answer": {"summary": "思考失败", "error": str(exc)},
-            }
-        if not isinstance(thought, dict):
-            return {
-                "decision": "finish",
-                "text": "思考结果无效",
-                "error": "think() 必须返回字典",
-                "answer": {"summary": "思考结果无效"},
-            }
-        return thought
-
-    def _invoke(self, action: Any, action_input: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
-        if not isinstance(action, str) or action not in self.tools:
-            return {"ok": False, "error": f"未知工具：{action}"}
-        try:
-            result = self.tools[action](action_input, context)
-        except Exception as exc:
-            return {"ok": False, "error": f"工具执行失败：{exc}"}
-        if not isinstance(result, dict):
-            return {"ok": False, "error": "工具必须返回字典"}
-        payload = dict(result)
-        payload.setdefault("ok", True)
-        return payload
-
-    @staticmethod
-    def _event(step: int, kind: str, thought: dict[str, Any], content: dict[str, Any]) -> dict[str, Any]:
-        return {
-            "step": step,
-            "type": kind,
-            "stage": thought.get("stage"),
-            "stage_label": thought.get("stage_label"),
-            "content": content,
+            "steps_used": len([t for t in trajectory if t["type"] == "thought"]),
+            "errors_count": len(context["errors"]),
+            "run_id": f"run_{uuid.uuid4().hex[:8]}",
+            "mode": "ReAct-2026"
         }

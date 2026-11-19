@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}外链四工具 · 研究 / 差距 / 质量 / 验证{% endblock %}
+{% block heading %}外链四工具可视化{% endblock %}
+{% block related %}<a href="/backlink">策略</a><a href="/backlink-competitor">竞品结构</a><a href="/backlink-competitor-quality">竞品质量</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.tool { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin: 10px 0; }
+.tool h3 { margin: 0 0 8px 0; font-size: 14px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.risk { background: var(--tint-red); color: var(--ink-red); }
+.gray { background: var(--tint-amber); color: var(--ink-amber); }
+.safe { background: var(--tint-green); color: var(--ink-green); }
+.sim { background: var(--surface-2); border-radius: 6px; padding: 10px; margin-top: 8px; font-size: 13px; }
+.row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+.row:last-child { border-bottom: none; }
+button.sim-btn { background: #64748b; font-size: 13px; padding: 6px 12px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+
+  <div class="card">
+    <h2>三类工具定位</h2>
+    <div class="tool">
+      <h3>1. 自动外链发布器 <span class="badge risk">高风险 · 不实现</span></h3>
+      <p>自动向目录、论坛、评论区、提交平台批量创建链接。Google 垃圾政策明确禁止。</p>
+      <div class="sim" id="pub-sim">
+        <div class="row"><span>模拟提交批次</span><span>1000 条目录链接</span></div>
+        <div class="row"><span>SpamBrain 识别概率</span><span style="color:var(--danger)">极高</span></div>
+        <div class="row"><span>链接价值传递</span><span>通常被抵消</span></div>
+        <div class="row"><span>推荐操作</span><span>不使用，改用人工外展</span></div>
+      </div>
+      <button class="sim-btn" onclick="runPublisher()">运行模拟（仅展示风险）</button>
+    </div>
+
+    <div class="tool">
+      <h3>2.5 竞品差距分析 <span class="badge safe">安全 · 研究用途</span></h3>
+      <p>Link Intersect：链接到多个竞争对手但未链你的域名，按质量分层输出优先目标。</p>
+      <div class="sim" id="gap-sim">
+        <div class="row"><span>分析竞争对手数</span><span>4</span></div>
+        <div class="row"><span>差距域名总数</span><span>86</span></div>
+        <div class="row"><span>重叠 2+ / 3+</span><span>31 / 12</span></div>
+        <div class="row"><span>高质量差距</span><span style="color:var(--ok)">9</span></div>
+        <div class="row"><span>推荐</span><span>优先重叠3+且质量≥0.70</span></div>
+      </div>
+      <button class="sim-btn" onclick="runGap()">运行差距分析</button>
+    </div>
+
+    <div class="tool">
+      <h3>3. 自动外链抓取器 <span class="badge gray">中风险 · 研究用途</span></h3>
+      <p>发现潜在目标站点、品牌提及、相关页面。仅用于研究，不可自动提交。</p>
+      <div class="sim" id="scrape-sim">
+        <div class="row"><span>发现目标</span><span>行业目录 × 12 · 资源页 × 8</span></div>
+        <div class="row"><span>品牌未链接提及</span><span>6 处</span></div>
+        <div class="row"><span>高相关目标</span><span style="color:var(--ok)">9</span></div>
+        <div class="row"><span>需人工审核</span><span>全部</span></div>
+        <div class="row"><span>下一步</span><span>按相关性评分后外展</span></div>
+      </div>
+      <button class="sim-btn" onclick="runScraper()">运行抓取模拟</button>
+    </div>
+
+    <div class="tool">
+      <h3>3. 自动外链有效性验证器 <span class="badge safe">安全 · 已实现模拟</span></h3>
+      <p>检查已有链接是否存活、follow 状态、锚文本变化、页面相关性。不创建新链接。</p>
+      <div class="sim" id="valid-sim">
+        <div class="row"><span>监控链接数</span><span>24</span></div>
+        <div class="row"><span>存活</span><span style="color:var(--ok)">21</span></div>
+        <div class="row"><span>丢失 / nofollow</span><span style="color:var(--warn)">3</span></div>
+        <div class="row"><span>平均相关性</span><span>0.72</span></div>
+        <div class="row"><span>建议</span><span>优先回收高相关丢失链接</span></div>
+      </div>
+      <button class="sim-btn" onclick="runValidator()">运行验证模拟</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>与工作流集成</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>SEOWorkflowReAct 已集成：backlink_research → backlink_competitor_gap → backlink_quality_score → backlink_validate。</li>
+      <li>竞品差距工具输出重叠计数、质量分层与模式识别。</li>
+      <li>质量评分模型：相关性 30% + 编辑性 20% + 真实流量 15% + 锚文本 15% + 权威 10% + 邻里 10%。</li>
+      <li>任何外展或发布决策必须经过 HITL 人工闸门。</li>
+      <li>记忆提取可沉淀「高质量来源特征」（相关性优先）。</li>
+      <li>发布器仅保留风险演示，不提供实际提交能力。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">合法自动化边界：监控与验证安全，研究抓取需人工审核，自动发布违反政策且价值通常被抵消。</p>
+  </div>
+</div>
+
+<script>
+function runPublisher() {
+  const el = document.getElementById('pub-sim');
+  el.innerHTML = '<div class="row"><span>模拟结果</span><span style="color:var(--danger)">链接被 SpamBrain 抵消</span></div><div class="row"><span>排名影响</span><span>无提升 / 潜在风险</span></div><div class="row"><span>建议</span><span>停止使用自动发布</span></div>';
+}
+function runScraper() {
+  const el = document.getElementById('scrape-sim');
+  el.innerHTML = '<div class="row"><span>新发现</span><span>相关资源页 5 个</span></div><div class="row"><span>未链接提及</span><span>3 处可回收</span></div><div class="row"><span>质量评分</span><span>需人工筛选</span></div><div class="row"><span>导出</span><span>已生成研究列表</span></div>';
+}
+function runGap() {
+  const el = document.getElementById('gap-sim');
+  el.innerHTML = '<div class="row"><span>分析完成</span><span>4 个竞品</span></div><div class="row"><span>高质量差距</span><span style="color:var(--ok)">9 个优先目标</span></div><div class="row"><span>模式</span><span>数据驱动 · 资源页 · 媒体PR</span></div><div class="row"><span>建议</span><span>优先外展重叠3+域名</span></div>';
+}
+function runValidator() {
+  const el = document.getElementById('valid-sim');
+  el.innerHTML = '<div class="row"><span>最新检查</span><span>24 条链接</span></div><div class="row"><span>存活率</span><span style="color:var(--ok)">87.5%</span></div><div class="row"><span>异常</span><span>2 条丢失 · 1 条锚文本变更</span></div><div class="row"><span>操作</span><span>已标记人工跟进</span></div>';
+}
+</script>
+{% endblock %}

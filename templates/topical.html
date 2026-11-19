@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}主题权威 · 支柱-集群{% endblock %}
+{% block heading %}主题权威{% endblock %}
+{% block related %}<a href="/seo">SEO</a><a href="/seo-deep">深度洞察</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.cluster { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.pillar-box { background: var(--tint-blue); border: 2px solid #3b82f6; border-radius: 10px; padding: 14px; min-width: 140px; text-align: center; font-weight: 600; }
+.cluster-box { background: var(--surface-2); border-radius: 8px; padding: 10px; min-width: 100px; text-align: center; font-size: 13px; }
+.rule { font-size: 13px; color: var(--muted); margin-top: 6px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>支柱 + 集群架构</h2>
+    <div class="cluster">
+      <div class="pillar-box">支柱页<br><small>核心主题全景</small></div>
+      <div class="cluster-box">集群 1<br>子问题 A</div>
+      <div class="cluster-box">集群 2<br>子问题 B</div>
+      <div class="cluster-box">集群 3<br>子问题 C</div>
+      <div class="cluster-box">…</div>
+    </div>
+    <div class="rule">规则：子主题仅在有独立可引用答案时才独立成页，否则并入最近支柱。</div>
+  </div>
+  <div class="card">
+    <h2>2026 关键点</h2>
+    <p class="muted">• 主题权威按“每个问题是否被 AI 引用”衡量，而非整体覆盖率。</p>
+    <p class="muted">• 支柱页回答新手级全景；集群页回答一个具体可引用问题。</p>
+    <p class="muted">• 强内部链接 + 实体信号（作者、组织 schema）放大权威。</p>
+    <p class="muted">• Agent 可自动映射集群与链接机会，但内容角度与发布仍需人工确认。</p>
+  </div>
+  <div class="card">
+    <h2>与系统联动</h2>
+    <p class="muted">SEO 工作流已包含“主题集群映射”阶段。可在此基础上扩展真实内容规划。</p>
+    <button onclick="location.href='/seo-workflow'">查看工作流</button>
+  </div>
+</div>
+{% endblock %}

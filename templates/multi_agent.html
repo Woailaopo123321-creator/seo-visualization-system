@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}分布式 Agent 架构{% endblock %}
+{% block heading %}分布式 Agent{% endblock %}
+{% block related %}<a href="/">看板</a><a href="/ai">AI</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.pattern { background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.pattern strong { display: block; margin-bottom: 4px; }
+.use { color: var(--ok); font-size: 13px; }
+.risk { color: var(--warn); font-size: 13px; }
+.mit { color: var(--ink-blue); font-size: 13px; margin-top: 4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info">📐 这些模式怎么落到本系统？见 <a href="/agent-patterns">模式与框架对比</a> 与 <a href="/agent-architecture">本系统架构与路线图</a>（Supervisor 路由 + LangGraph 流水线 + 人工闸门）。</div>
+  <div class="card">
+    <h2>核心模式与风险优化</h2>
+    <div class="pattern">
+      <strong>Orchestrator-Worker</strong>
+      中央编排器分解任务，分派专家，汇总结果。
+      <div class="use">适用：子任务可预测</div>
+      <div class="risk">风险：编排器瓶颈 / 单点故障</div>
+      <div class="mit">优化：限制直接下属数；加超时与重试；轨迹全量记录</div>
+    </div>
+    <div class="pattern">
+      <strong>Hierarchical</strong>
+      多层编排器。
+      <div class="use">适用：大规模分解</div>
+      <div class="risk">风险：摘要丢失细节</div>
+      <div class="mit">优化：结构化状态传递；关键字段不压缩；中间校验</div>
+    </div>
+    <div class="pattern">
+      <strong>Parallel Fan-out / Fan-in</strong>
+      独立任务并行，再汇聚。
+      <div class="use">适用：无依赖低延迟</div>
+      <div class="risk">风险：合并冲突 / 复杂聚合</div>
+      <div class="mit">优化：明确聚合规则（投票/优先级）；失败只重试单路径</div>
+    </div>
+    <div class="pattern">
+      <strong>Sequential Pipeline</strong>
+      固定顺序依赖。
+      <div class="use">适用：严格阶段</div>
+      <div class="risk">风险：早期错误传播</div>
+      <div class="mit">优化：每阶段 schema 校验；中间人工闸门；可回滚</div>
+    </div>
+    <div class="pattern">
+      <strong>Handoff / Blackboard</strong>
+      对等或共享状态。
+      <div class="use">适用：动态路由</div>
+      <div class="risk">风险：追踪困难 / 上下文丢失</div>
+      <div class="mit">优化：结构化 handoff payload；跨边界 span；全轨迹日志</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>系统级优化</h2>
+    <p class="muted">当前 Coordinator 已支持轨迹记录。建议持续强化：</p>
+    <ul style="margin:8px 0; padding-left:18px; font-size:14px;">
+      <li>跨 Agent 边界 schema 校验</li>
+      <li>独立质量评分与超时熔断</li>
+      <li>Human-in-the-Loop 闸门（已在 SEO 工作流中实现）</li>
+      <li>可观测性：完整 Thought-Action-Observation 轨迹</li>
+    </ul>
+    <button onclick="location.href='/seo-workflow'">查看带闸门的工作流</button>
+  </div>
+  <div class="card">
+    <h2>协议</h2>
+    <p><strong>MCP</strong> — 工具调用边界清晰</p>
+    <p><strong>A2A</strong> — Agent 间结构化通信</p>
+  </div>
+</div>
+{% endblock %}

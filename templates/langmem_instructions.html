@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}LangMem 指令设计{% endblock %}
+{% block heading %}LangMem 指令设计{% endblock %}
+{% block related %}<a href="/langmem-dedup">去重合并</a><a href="/langmem-semantic">语义提取</a><a href="/langchain-memory">记忆模块</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.pattern { border-left-color: #059669; }
+.risk { border-left-color: #dc2626; }
+.example { border-left-color: #7c3aed; }
+code { background: var(--border); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>指令的作用</h2>
+    <div class="note"><strong>核心控制点</strong>instructions 是提取与合并行为的主要控制。默认指令泛化；自定义指令决定「提取什么」与「如何合并」。</div>
+    <div class="note"><strong>与 Schema 协作</strong>Schema 定义结构（字段、类型）；指令引导选择与填充。两者共同决定输出质量。</div>
+    <div class="note"><strong>覆盖默认</strong>提供 instructions 后，模型按你的规则执行，而非泛化的「值得记忆」判断。</div>
+  </div>
+
+  <div class="card">
+    <h2>常见模式</h2>
+    <div class="note pattern"><strong>单次调用</strong><code>Record everything in a single Memory call</code>。某些模型对多工具调用不稳定时，强制单次输出完整记忆。</div>
+    <div class="note pattern"><strong>主题分离</strong><code>A new topic gets a new memory; do not merge it into an existing one</code>。避免过度合并，保持集合粒度。</div>
+    <div class="note pattern"><strong>重要性标记</strong><code>Indicate their importance</code>。要求模型标注 [IMPORTANT] / [BACKGROUND]，便于后续检索加权。</div>
+    <div class="note pattern"><strong>上下文要求</strong><code>Include the context, thought process, and why the approach worked</code>。情景记忆需完整推理链，而非孤立事实。</div>
+    <div class="note pattern"><strong>独立可读</strong>要求记忆在脱离对话后仍可理解。避免「用户说了 yes」这类无上下文条目。</div>
+  </div>
+
+  <div class="card">
+    <h2>示例指令</h2>
+    <div class="note example"><strong>语义事实</strong><code>Extract all noteworthy facts, events, and relationships. Indicate their importance.</code></div>
+    <div class="note example"><strong>用户画像</strong><code>Extract user preferences and settings</code>（配合 enable_inserts=False）</div>
+    <div class="note example"><strong>情景记忆</strong><code>Extract examples of successful interactions. Include the context, thought process, and why the approach worked.</code></div>
+    <div class="note example"><strong>客服场景</strong><code>Extract what helps support this customer. A new order or a new topic gets a new memory.</code></div>
+  </div>
+
+  <div class="card">
+    <h2>设计风险</h2>
+    <div class="note risk"><strong>过度合并</strong>指令未明确分离规则时，模型可能把新主题追加到旧记忆，丢失粒度。</div>
+    <div class="note risk"><strong>提取不足</strong>指令过于严格或模糊，导致关键事实被忽略，召回率下降。</div>
+    <div class="note risk"><strong>模型敏感</strong>同一指令在不同模型上行为不同。需针对目标模型测试与调整。</div>
+    <div class="note risk"><strong>无验证</strong>LangMem 不内置质量检查。错误提取会持久化，需应用层监控。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>若引入记忆提取，指令是关键设计点。</li>
+      <li>SEO 场景可设计：主题优先级、发布偏好、已完成任务。</li>
+      <li>建议先小规模测试指令，观察提取与合并结果后再扩展。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">LangMem 指令设计是应用级控制点。好的指令明确「提取什么」「何时新建 vs 合并」「需要哪些上下文」。Schema 提供结构，指令提供意图。</p>
+  </div>
+</div>
+{% endblock %}

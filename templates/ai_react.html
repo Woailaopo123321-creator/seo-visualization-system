@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}ReAct{% endblock %}
+{% block heading %}ReAct 轨迹{% endblock %}
+{% block related %}<a href="/ai">AI</a><a href="/">看板</a>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <p class="muted" style="margin-bottom:8px">ReAct（Thought → Action → Observation）分析学习看板中的任务进度。</p>
+    <button onclick="run(this)">运行分析</button>
+    <div id="out" style="margin-top:12px" aria-live="polite"><div class="state"><div class="icon" aria-hidden="true">🧠</div><strong>还没有分析结果</strong><span>点击上方按钮，Agent 会读取看板任务并展示完整推理轨迹</span></div></div>
+  </div>
+</div>
+<script>
+async function run(btn) {
+  await SEO.withButton(btn, async () => {
+    const out = document.getElementById("out");
+    SEO.loading(out, "Agent 正在推理…");
+    try {
+      const data = await SEO.postJSON("/api/ai/react", {});
+      const ans = data.result || {};
+      out.innerHTML = `<p><strong>分析：</strong>${SEO.escapeHtml(ans.analysis || "")}</p>
+        <ul>${(ans.suggestions || []).map(s => `<li>${SEO.escapeHtml(s)}</li>`).join("")}</ul>
+        <p class="muted">步数 ${data.steps_used} · 耗时 ${data.elapsed_ms ?? "-"} ms${data.cached ? " · 缓存命中" : ""}</p>`
+        + SEO.renderTrajectory(data.trajectory);
+      SEO.done(out);
+    } catch (e) { SEO.failed(out, e, () => run(btn)); }
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}最新谷歌 SEO · 2026{% endblock %}
+{% block heading %}最新谷歌 SEO · 2026{% endblock %}
+{% block related %}<a href="/dashboard">仪表盘</a><a href="/seo-workflow">工作流</a><a href="/aeo-geo">AEO/GEO</a><a href="/eeat">E-E-A-T</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.hot { border-left-color: #dc2626; }
+.ai { border-left-color: #7c3aed; }
+.trust { border-left-color: #059669; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心更新时间线</h2>
+    <div class="note hot"><strong>2026 年 11 月核心更新</strong>11 月 10 日启动，全球生效，预计最长 2 周。本年度第三次核心更新（3 月、5 月之后）。无特定目标，旨在更好呈现相关内容。</div>
+    <div class="note"><strong>2026 年 9 月垃圾更新</strong>已于 10 月完成。垃圾政策现覆盖 AI Overviews 与 AI Mode。</div>
+    <div class="note"><strong>AI 模型升级</strong>Gemini 4 Hydrogen 成为 AI Mode 默认模型（11 月 12 日），处理最难问题并增强查询扇出。</div>
+  </div>
+
+  <div class="card">
+    <h2>AI Overviews 现状</h2>
+    <div class="grid-2">
+      <div class="note ai"><strong>覆盖率</strong>已出现在超过 80% 的搜索中，包括品牌词与无结果查询。</div>
+      <div class="note ai"><strong>引用趋势</strong>AI Overview 来源中，约 56% 同时排名有机前 20（2026 年 9 月）。</div>
+      <div class="note ai"><strong>链接优化</strong>来源链接更突出，面板更丰富，可能带来更多点击。</div>
+      <div class="note ai"><strong>Search Console</strong>新增 Generative AI 报告，可追踪 AI 曝光（注意 11 月 9-11 日日志错误）。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>E-E-A-T 与内容质量</h2>
+    <div class="note trust"><strong>Trust 仍是核心</strong>Google 明确 Trust 最重要。虚假作者信息（AI 生成头像、伪造资历）视为低质量信号。</div>
+    <div class="note trust"><strong>AI 内容审查</strong>需人工事实核查与审核 AI 生成内容，包括标题、元描述、结构化数据。</div>
+    <div class="note trust"><strong>Helpful Content</strong>优先有助于人的可靠信息；主内容与 EOT/SA 部分有新指引。</div>
+    <div class="note"><strong>YMYL 要求</strong>你的钱或你的生活类主题需准确并符合专家共识。</div>
+  </div>
+
+  <div class="card">
+    <h2>实践建议</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>等待再测量</strong>：核心更新期间避免大幅改动，完成后对比数据。</li>
+      <li><strong>原创与信息增益</strong>：提供第一手经验与原创数据，避免纯总结。</li>
+      <li><strong>结构化与段落</strong>：清晰标题层级、40-60 词答案块，便于 AI 引用。</li>
+      <li><strong>作者可信</strong>：真实作者信息，避免伪造资历。</li>
+      <li><strong>追踪双指标</strong>：有机排名 + AI 引用（Search Console Generative AI 报告）。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">整合自 2026 年 11 月 Google 核心更新、AI Overviews 覆盖率、E-E-A-T 更新与 Search Console Generative AI 报告。Trust 仍是核心，AI 引用成为新指标。</p>
+  </div>
+</div>
+{% endblock %}

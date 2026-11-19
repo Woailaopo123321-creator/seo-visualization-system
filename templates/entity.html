@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}实体 SEO · sameAs{% endblock %}
+{% block heading %}实体 SEO{% endblock %}
+{% block related %}<a href="/seo-deep">深度洞察</a><a href="/aeo-geo">AEO/GEO</a><a href="/topical">主题权威</a><a href="/eeat">E-E-A-T</a>{% endblock %}
+{% block head %}
+<style>
+.entity { background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.sameas { font-size: 13px; color: var(--muted); }
+.tag { display: inline-block; background: var(--tint-blue); color: var(--ink-blue); font-size: 12px; padding: 2px 8px; border-radius: 4px; margin: 2px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>实体主页 + sameAs</h2>
+    <div class="entity">
+      <strong>组织实体（Organization）</strong>
+      <div class="sameas">主页声明：名称、描述、logo、@id</div>
+      <div style="margin-top:6px;">
+        <span class="tag">Wikidata</span>
+        <span class="tag">LinkedIn</span>
+        <span class="tag">Crunchbase</span>
+        <span class="tag">GitHub</span>
+      </div>
+    </div>
+    <div class="entity">
+      <strong>作者实体（Person）</strong>
+      <div class="sameas">真实经历 + 可验证资料 + worksFor 关联组织</div>
+      <div style="margin-top:6px;">
+        <span class="tag">LinkedIn</span>
+        <span class="tag">ORCID</span>
+        <span class="tag">个人主页</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>2026 关键规则</h2>
+    <p class="muted">• sameAs 是“这些外部页面是同一实体”的声明，需与可见文本一致。</p>
+    <p class="muted">• 优先 Wikidata / 权威资料库，其次验证过的社交与行业档案。</p>
+    <p class="muted">• 用 @graph + 稳定 @id 连接组织、作者、文章，避免碎片化信号。</p>
+    <p class="muted">• 外部品牌提及与第三方确认比单纯 schema 更重要。</p>
+  </div>
+  <div class="card">
+    <h2>AI 引用追踪</h2>
+    <p class="muted">监控目标从排名转向“被哪些 AI 引擎引用了哪些 URL”。需按提示词记录：是否出现 AI Overview、是否引用本站、引用了哪些竞品/第三方。</p>
+    <p class="muted">Search Console 已有生成式 AI 报告（按页面/国家/设备），但缺少具体提示词与完整引用列表。</p>
+  </div>
+</div>
+{% endblock %}

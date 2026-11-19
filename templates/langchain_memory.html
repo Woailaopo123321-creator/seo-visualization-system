@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}LangChain 记忆模块{% endblock %}
+{% block heading %}LangChain 记忆模块{% endblock %}
+{% block related %}<a href="/langgraph-state">状态管理</a><a href="/langgraph">LangGraph</a><a href="/ai-workflow">AI 工作流</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.legacy { border-left-color: #d97706; }
+.current { border-left-color: #059669; }
+.strategy { border-left-color: #7c3aed; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>当前架构（2026）</h2>
+    <div class="note current"><strong>短期记忆</strong>线程范围内。通过 Checkpointer 持久化图状态。支持恢复、HITL、时间旅行。范围：单次对话。</div>
+    <div class="note current"><strong>长期记忆</strong>跨线程。通过 Store 存储结构化数据（用户偏好、事实）。命名空间隔离。节点可直接读写。</div>
+    <div class="note current"><strong>LangMem</strong>在 Store 之上提供记忆提取与管理。支持语义（事实）、情景（经历）、程序（指令）三类记忆。</div>
+    <div class="note"><strong>旧类已弃用</strong>ConversationBufferMemory 等已移至 langchain-classic，计划在 2.0 移除。推荐使用 checkpointer + store。</div>
+  </div>
+
+  <div class="card">
+    <h2>经典记忆类型（参考）</h2>
+    <div class="grid-2">
+      <div class="note legacy"><strong>Buffer</strong>完整保存所有消息。精确但 token 无限增长。适合短对话。</div>
+      <div class="note legacy"><strong>Window</strong>仅保留最近 k 轮。固定开销，丢失早期细节。</div>
+      <div class="note legacy"><strong>Summary</strong>用 LLM 压缩历史为摘要。节省 token，可能丢失细节。</div>
+      <div class="note legacy"><strong>SummaryBuffer</strong>近期原文 + 早期摘要。平衡精确与成本。</div>
+      <div class="note legacy"><strong>Entity</strong>抽取实体属性。适合跟踪人物/事物事实。</div>
+      <div class="note legacy"><strong>Vector</strong>向量检索相关历史。适合语义召回大量记录。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>上下文管理策略</h2>
+    <div class="note strategy"><strong>裁剪（Trim）</strong>调用模型前只保留最近消息。简单但可能丢失关键信息。</div>
+    <div class="note strategy"><strong>删除（Delete）</strong>从状态永久移除消息。适合清理无关内容。</div>
+    <div class="note strategy"><strong>摘要（Summarize）</strong>用模型压缩早期消息为摘要。保留语义，降低 token。</div>
+    <div class="note strategy"><strong>自定义</strong>中间件实现特定过滤逻辑（如按主题、按实体）。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>当前系统使用进程内缓存与 ReAct 轨迹日志，无跨请求记忆。</li>
+      <li>若需对话连续性，可评估引入 checkpointer 机制。</li>
+      <li>长期知识（用户偏好、SEO 策略）可考虑 Store 或外部持久化。</li>
+      <li>摘要策略可用于压缩工作流轨迹，避免日志膨胀。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">2026 年 LangChain 记忆以 LangGraph 的 checkpointer（短期）与 store（长期）为核心。经典 Buffer/Summary 类已弃用，但思想仍可用于上下文管理。</p>
+  </div>
+</div>
+{% endblock %}

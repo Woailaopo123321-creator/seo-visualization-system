@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}E-E-A-T 深度 AI 审计{% endblock %}
+{% block heading %}🔍 E-E-A-T 深度 AI 审计（ReAct）{% endblock %}
+{% block related %}<a href="/eeat">信任信号</a><a href="/seo-path">学习路径</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.score { font-size: 48px; font-weight: bold; color: var(--danger); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>运行深度信任审计</h2>
+    <p>使用专用 ReAct Agent 对作者真实性、第一手经验、基础信任设施进行多步推理审计。</p>
+    <textarea id="sample" rows="3" maxlength="5000" placeholder="（可选）粘贴待审计的页面内容" style="width:100%;margin:8px 0;padding:8px;border:1px solid var(--border);border-radius:8px;font:inherit"></textarea>
+    <button onclick="runAudit(this)">开始审计</button>
+    <div id="result" style="margin-top:20px;" aria-live="polite"></div>
+    <div id="trajectory"></div>
+  </div>
+</div>
+<script>
+async function runAudit(btn) {
+  const result = document.getElementById("result");
+  await SEO.withButton(btn, async () => {
+    SEO.loading(result, "正在审计…");
+    document.getElementById("trajectory").innerHTML = "";
+    try {
+      const sample = document.getElementById("sample").value;
+      const data = await SEO.postJSON("/api/ai/eeat-audit", sample.trim() ? {content_sample: sample} : {});
+      const ans = data.result || {};
+      let html = `<div class="score">${SEO.escapeHtml(ans.overall_score ?? 0)}</div><div style="color:var(--muted)">综合信任分（满分 100）</div>`;
+      html += `<p><strong>建议：</strong>${SEO.escapeHtml(ans.recommendation || "")}</p><ul>`;
+      (ans.priority_actions || []).forEach(a => html += `<li>${SEO.escapeHtml(a)}</li>`);
+      html += `</ul>`;
+      result.innerHTML = html; SEO.done(result);
+      document.getElementById("trajectory").innerHTML = SEO.renderTrajectory(data.trajectory);
+    } catch (e) {
+      SEO.failed(result, e, () => runAudit(btn));
+    }
+  });
+}
+</script>
+{% endblock %}

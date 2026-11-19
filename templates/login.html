@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}管理员登录{% endblock %}
+{% block heading %}🔑 管理员登录{% endblock %}
+{% block content %}
+<div class="container" style="max-width:420px;margin-top:6vh">
+  <form class="card" method="post" action="/login">
+    {% if not auth.token_required %}
+    <p class="muted" style="margin-bottom:12px">当前未设置 <code>SEO_ADMIN_TOKEN</code>，本机访问无需登录即可修改数据；其他设备只能浏览。</p>
+    {% endif %}
+    {% if error %}<div class="error-box" role="alert" id="login-error" style="margin:0 0 12px">{{ error }}</div>{% endif %}
+    <label for="token" class="muted">管理员令牌（SEO_ADMIN_TOKEN）</label>
+    <input id="token" name="token" type="password" autocomplete="current-password" required {% if not locked %}autofocus{% endif %} {% if error %}aria-invalid="true" aria-describedby="login-error"{% endif %} {% if locked %}disabled{% endif %} style="width:100%;margin:6px 0 12px">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button type="submit" style="width:100%" {% if locked %}disabled{% endif %}>登录</button>
+    <p class="muted" style="margin:10px 0 0">为防止暴力猜测，连续输错 {{ max_attempts }} 次会锁定 {{ lockout_minutes }} 分钟。</p>
+  </form>
+</div>
+{% endblock %}

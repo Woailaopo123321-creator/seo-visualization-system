@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}可视化方案{% endblock %}
+{% block heading %}方案{% endblock %}
+{% block related %}<a href="/">看板</a>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>可视化方案库</h2>
+    <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(140px,1fr));">
+      <div>思维导图</div><div>Kanban</div><div>时间线</div><div>路径图</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

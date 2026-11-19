@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}AI Overviews 优化{% endblock %}
+{% block heading %}AI Overviews 优化{% endblock %}
+{% block related %}<a href="/seo-2026">2026 SEO</a><a href="/aeo-geo">AEO/GEO</a><a href="/passage">段落架构</a><a href="/citation">引用追踪</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.official { border-left-color: #059669; }
+.evidence { border-left-color: #7c3aed; }
+.caution { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>Google 官方立场</h2>
+    <div class="note official"><strong>无额外技术要求</strong>页面只需被索引且可显示摘要即可进入 AI Overviews 或 AI Mode。无需特殊 schema、llms.txt 或 AI 专用标记。</div>
+    <div class="note official"><strong>仍是 SEO</strong>独特、有用、非商品化内容长期影响大于格式技巧。结构化数据需与可见文本一致。</div>
+    <div class="note official"><strong>控制开关</strong>Search Console 设置中可控制是否参与生成式 AI 功能（默认包含）。</div>
+  </div>
+
+  <div class="card">
+    <h2>实证观察（2026）</h2>
+    <div class="grid-2">
+      <div class="note evidence"><strong>来源分布</strong>约 89% 引用可能来自非第一页有机结果（一项 306 引用测试）。排名第一仍有利，但非唯一路径。</div>
+      <div class="note evidence"><strong>查询扇出</strong>覆盖子问题的页面引用概率更高。排名多个扇出查询的页面引用可能性提升约 161%。</div>
+      <div class="note caution"><strong>格式效果有限</strong>FAQ schema 与摘要框在测试中未显示明显优势。问题式标题有轻微帮助。</div>
+      <div class="note evidence"><strong>答案前置</strong>被引用页面中约 87% 在前 100 词内给出直接答案。40-60 词答案块仍是实用结构。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>实用优化清单</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>基础资格</strong>：确保页面可爬取、已索引、无 nosnippet 限制。</li>
+      <li><strong>答案前置</strong>：每个主要章节开头 40-60 词给出直接答案。</li>
+      <li><strong>问题式标题</strong>：H2/H3 使用用户会搜索的问题形式。</li>
+      <li><strong>原创证据</strong>：提供第一手数据、截图、方法，而非纯总结。</li>
+      <li><strong>主题集群</strong>：支柱页 + 子主题覆盖，支持查询扇出。</li>
+      <li><strong>实体一致</strong>：品牌、作者、组织信息跨页面一致。</li>
+      <li><strong>追踪双指标</strong>：有机排名 + Search Console Generative AI 报告。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>与本系统映射</h2>
+    <div class="note"><strong>已集成</strong>段落架构页面（/passage）覆盖 40-60 词答案；引用追踪（/citation）支持来源监控；工作流含 AEO/GEO 阶段。</div>
+    <div class="note"><strong>建议</strong>优先保证索引与原创内容；结构化为辅助；持续监控 AI 引用而非仅依赖格式。</div>
+  </div>
+
+  <div class="card">
+    <p class="muted">整合自 Google 官方文档与 2026 年实证测试。无特殊技术门槛，答案前置与原创内容仍是最实用路径。</p>
+  </div>
+</div>
+{% endblock %}

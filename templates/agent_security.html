@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}多智能体安全协议{% endblock %}
+{% block heading %}多智能体安全协议{% endblock %}
+{% block related %}<a href="/overview">总览</a><a href="/dl-automation">DL优化</a><a href="/multi-agent">协作</a><a href="/seo-workflow">工作流</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.protocol { border-left: 4px solid #4f46e5; padding: 10px 14px; margin: 8px 0; background: var(--surface); }
+.protocol strong { color: var(--text); }
+.critical { border-left-color: #dc2626; }
+.control { border-left-color: #059669; }
+.audit { border-left-color: #7c3aed; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) {
+.grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心安全协议</h2>
+    <div class="protocol control">
+      <strong>HITL / I-HITL（人工介入）</strong>
+      关键操作需显式人工批准。I-HITL 要求即使本地环境被攻破，仍需可信设备确认。本系统：发布闸门强制人工确认。
+    </div>
+    <div class="protocol critical">
+      <strong>Kill Switch（紧急关闭）</strong>
+      三要素：① 全局停止新任务 ② 撤销已发凭证 ③ 清理孤儿进程。本系统：步骤预算耗尽 + 重复动作检测 = 基础 Kill Switch。
+    </div>
+    <div class="protocol">
+      <strong>委派权限收窄</strong>
+      每跳委派权限取交集（自身角色 ∩ 原始授权）。子 Agent 不得继承编排器全部权限。本系统：专用 Agent 单一职责。
+    </div>
+    <div class="protocol audit">
+      <strong>审计与可追溯</strong>
+      完整记录操作轨迹、决策依据、异常检测。本系统：ReAct 轨迹日志已具备基础可追溯。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Kill Switch 三要素</h2>
+    <div class="grid-2">
+      <div class="protocol critical"><strong>全局停止</strong>停止新步骤、新运行、队列工作。由编排器/网关执行。</div>
+      <div class="protocol critical"><strong>凭证撤销</strong>使已签发令牌失效。防止停止后仍能访问。</div>
+      <div class="protocol critical"><strong>孤儿清理</strong>扫描并终止已启动但未结束的进程与任务。</div>
+      <div class="protocol"><strong>本系统现状</strong>步骤预算与重复检测已实现软停止；硬停止需外部控制面。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>委派安全规则</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>身份认证</strong>：Agent 间通信需相互认证（mTLS / 工作负载身份），不信任“内部”请求。</li>
+      <li><strong>权限收窄</strong>：每跳委派权限取交集，子任务仅获所需最小权限。</li>
+      <li><strong>结构化交接</strong>：Agent 间传递使用受约束模式，避免自由文本注入。</li>
+      <li><strong>零信任链</strong>：Agent-ZTA 风格，运行时安全状态双向传播，异常分支可隔离。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>与本系统映射</h2>
+    <div class="protocol control"><strong>已具备</strong>ReAct 步骤预算 · 重复动作检测 · 人工发布闸门 · 轨迹日志</div>
+    <div class="protocol"><strong>待增强</strong>硬 Kill Switch（凭证撤销 + 孤儿清理）· 结构化 Agent 交接 · 运行时权限收窄</div>
+    <div class="protocol audit"><strong>建议</strong>关键路径强制 HITL；异常时触发软停止并记录；定期审计轨迹。</div>
+  </div>
+
+  <div class="card">
+    <p class="muted">整合自 2026 安全对齐框架与近期协议研究（I-HITL、Kill Switch 三要素、委派权限收窄）。对齐是底线，控制是保障。</p>
+  </div>
+</div>
+{% endblock %}

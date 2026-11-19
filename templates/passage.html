@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}段落架构 · 可提取答案{% endblock %}
+{% block heading %}段落架构{% endblock %}
+{% block related %}<a href="/crasp">CRASP</a><a href="/aeo-geo">AEO/GEO</a><a href="/seo-deep">深度洞察</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.block { background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+.good { border-left-color: #10b981; }
+.bad { border-left-color: #ef4444; }
+.check { font-size: 14px; margin: 4px 0; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>可提取答案标准（2026）</h2>
+    <div class="block good">
+      <strong>推荐结构</strong>
+      <div class="check">• 问题式 H2（匹配用户真实提问）</div>
+      <div class="check">• 紧接着 40–60 字直接答案（无开场白）</div>
+      <div class="check">• 自包含 130–170 字段落（可单独被提取）</div>
+      <div class="check">• 至少一个带源原创数字 / 数据</div>
+      <div class="check">• 表格或列表呈现比较与步骤</div>
+    </div>
+    <div class="block bad">
+      <strong>常见失败</strong>
+      <div class="check">• 答案埋在长段落中间</div>
+      <div class="check">• 纯叙述无数字、无实体</div>
+      <div class="check">• 标题与内容不匹配</div>
+      <div class="check">• 结构化数据与可见文本不一致</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>CRASP 框架</h2>
+    <p>详见 <a href="/crasp">CRASP 深度解析</a>：Clarity · Relevance · Authority · Structure · Precision</p>
+    <p><strong>C</strong>larity — 可直接引用的清晰陈述</p>
+    <p><strong>R</strong>elevance — 匹配对话式查询意图</p>
+    <p><strong>A</strong>uthority — 来源、作者、第三方确认</p>
+    <p><strong>S</strong>tructure — 可扫描、可提取格式</p>
+    <p><strong>P</strong>recision — 具体数字、日期、实体</p>
+  </div>
+
+  <div class="card">
+    <h2>页面模板要点</h2>
+    <p>1. H1 明确说明页面回答什么</p>
+    <p>2. 开头 40–60 字 TL;DR / 直接答案</p>
+    <p>3. 每个主要 H2 后立即给出可提取答案</p>
+    <p>4. 在前 500 字内密集命名相关实体</p>
+    <p>5. 用表格承载比较数据（AI 更易引用）</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}SEO 可视化{% endblock %}
+{% block heading %}SEO{% endblock %}
+{% block related %}<a href="/">看板</a><a href="/seo-path">路径</a><a href="/keywords">关键词</a><a href="/eeat">E-E-A-T</a><a href="/seo-minimal">极简结合</a>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>学习路径看板</h2>
+    <div class="grid" style="grid-template-columns: repeat(4,1fr);">
+      <div><strong>搜索意图</strong><div class="muted">基础</div></div>
+      <div><strong>Helpful Content</strong><div class="muted">E-E-A-T</div></div>
+      <div><strong>技术基础</strong><div class="muted">CWV</div></div>
+      <div><strong>AI 搜索</strong><div class="muted">Overviews</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <button onclick="location.href='/seo-path'">分析学习路径</button>
+    <button onclick="location.href='/eeat-audit'">E-E-A-T 审计</button>
+  </div>
+</div>
+{% endblock %}

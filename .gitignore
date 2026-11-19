@@ -1,7 +1,8 @@
-__pycache__/
-*.py[cod]
-.pytest_cache/
 .venv/
-venv/
-*.egg-info/
-.mypy_cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+app.log
+screenshots/
+data/learning_data.json
+data/workflow.sqlite*

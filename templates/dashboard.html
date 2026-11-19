@@ -1,83 +1,176 @@
 {% extends "base.html" %}
-{% from "macros.html" import chart_card %}
 {% block title %}系统概览{% endblock %}
+{% block heading %}系统概览{% endblock %}
+{% block subheading %}整合学习可视化、SEO 工作流、多智能体协作与心理学洞察{% endblock %}
+{% block actions %}<div class="date-picker">📅 本周 {{ d.date_range }}</div>{% endblock %}
+{% block head %}
+<style>
+.date-picker{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--muted);white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);text-decoration:none;color:inherit;transition:border-color .15s}
+a.stat:hover{border-color:#0f766e}
+.stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+.stat .label{font-size:13px;color:var(--muted)}
+.stat .num{font-size:28px;font-weight:700;margin:4px 0;color:var(--text)}
+.stat .num small{font-size:16px;font-weight:600;color:var(--muted)}
+.stat .delta{font-size:12px;color:var(--ok)}
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);min-width:0}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+.card-header h2{font-size:15px;font-weight:600}
+.card-header a{font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
+.kanban{display:flex;gap:10px}
+.col{background:var(--surface);border-radius:10px;flex:1;padding:10px;min-width:0;display:flex;flex-direction:column}
+.col-header{font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;color:#fff;margin-bottom:8px;display:flex;justify-content:space-between}
+.col .item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;margin-bottom:8px;word-break:break-word}
+.col .item .tag{font-size:11px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;gap:4px}
+.col .item .bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px}
+.col .item .bar i{display:block;height:100%;background:#0f766e;border-radius:2px}
+.col .more{font-size:11px;color:var(--faint);text-align:center;margin-bottom:6px}
+.col .empty{font-size:11px;color:var(--faint);text-align:center;padding:10px 0}
+.add-btn{font-size:12px;color:var(--muted);text-align:center;padding:8px;cursor:pointer;border:none;border-top:1px dashed var(--border);margin-top:auto;background:none;width:100%}
+.add-btn:hover{color:var(--accent)}
+.flow{display:flex;flex-direction:column;gap:6px}
+.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px;display:grid;grid-template-columns:28px 64px 1fr;align-items:center;gap:6px;text-align:left}
+.flow-step.done{background:var(--tint-indigo);border-color:var(--line-indigo)}
+.flow-step.current{border:2px solid #0f766e;background:var(--card)}
+.flow-step .icon{font-size:18px}
+.flow-step .num{font-size:12px;color:var(--muted);white-space:nowrap}
+.flow-step .name{font-size:13px;font-weight:600}
+.flow-step .desc{display:inline;font-size:12px;color:var(--faint);font-weight:400;margin-left:2px}
+.flow-arrow{display:none}
+.flow-step .now{font-size:11px;color:var(--accent);margin-left:6px;font-weight:500}
+.progress{margin-top:12px;height:4px;background:var(--border);border-radius:2px}
+.progress i{display:block;height:100%;background:#0f766e;border-radius:2px}
+.progress-label{font-size:11px;color:var(--muted);margin-top:6px;text-align:right}
+.agents{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px 0}
+.agent-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;text-align:center;min-width:100px}
+.agent-box.center{background:#0f766e;color:#fff;border:none}
+.agent-box .role{font-size:11px;opacity:0.85;margin-top:4px}
+.wf-live{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding:8px 12px;border-radius:8px;background:var(--tint-indigo);border:1px dashed var(--line-indigo);font-size:12px;color:var(--ink-indigo);text-decoration:none}
+.agent-meta{text-align:center;font-size:11px;color:var(--faint);margin-top:8px}
+.psych{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.psych-item{text-align:center;padding:10px;background:var(--surface);border-radius:8px}
+.psych-item .score{font-size:22px;font-weight:700}
+.psych-item .label{font-size:12px;color:var(--muted);margin-top:4px}
+.psych-item .status{font-size:11px;margin-top:4px}
+.tip{background:var(--tint-amber);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink-amber);margin-top:12px}
+@media (max-width:1180px){
+  .grid-2{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+  .stats,.psych{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat .num{font-size:22px}
+  .kanban{overflow-x:auto;padding-bottom:8px}
+  .col{min-width:150px;flex:none}
+}
+</style>
+{% endblock %}
 {% block content %}
-<header class="page-header reveal">
-  <p class="eyebrow">总览</p>
-  <h1>系统概览</h1>
-  <p class="lede">中文学习台：外链分析、多智能体协作、心理学洞察、SEO 知识笔记和自动化工作流。图表在加载后显示。</p>
-</header>
-<p class="callout reveal">达到 {{ threshold }} 的目标进入外展候选，发出前仍要人工确认。</p>
-<div id="page-alert" class="page-alert" role="status">正在加载数据…</div>
-<div id="stats" class="stats reveal"></div>
-<div class="layout-2 reveal">
-  {{ chart_card("weights-chart", "维度权重") }}
-  {{ chart_card("candidates-chart", "示例候选质量分") }}
-</div>
-<section class="card reveal">
-  <div class="card-head">
-    <h2>工作流阶段</h2>
-    <span class="badge badge-live">流程</span>
-  </div>
-  <ol class="stage-row">
-    {% for stage in stages %}
-    <li><span>{{ loop.index }}</span>{{ stage.label }}</li>
-    {% endfor %}
-  </ol>
-</section>
-<section class="reveal">
-  <h2 class="section-title">多智能体协作</h2>
-  <p class="hint">四个角色按研究 → 差距 → 评分 → 验证接力，最后仍交给人工确认。</p>
-  <div class="insight-grid">
-    {% for agent in agents %}
-    <article class="insight">
-      <strong>{{ agent.name }}</strong>
-      <span class="mono">{{ agent.role }}</span>
-      <span>{{ agent.duty }}</span>
-    </article>
-    {% endfor %}
-  </div>
-</section>
-<section class="reveal">
-  <h2 class="section-title">心理学洞察</h2>
-  <p class="hint">把学习与外展节奏压到可读、可复核的步骤上，避免工具噪音掩盖判断。</p>
-  <div class="insight-grid">
-    {% for item in psychology %}
-    <article class="insight">
-      <strong>{{ item.title }}</strong>
-      <span>{{ item.text }}</span>
-    </article>
-    {% endfor %}
-  </div>
-</section>
-<section class="reveal">
-  <h2 class="section-title">页面</h2>
-  <div class="link-grid">
-    {% for item in nav_items if item.path != '/dashboard' %}
-    <a class="link-card" href="{{ item.path }}">
-      <strong>{{ item.label }}</strong>
-      <span>{{ item.description }}</span>
+{% if d.wf.waiting_approval %}<a class="callout warn" style="display:block;text-decoration:none" href="/workflow-runs">⏸ 有 {{ d.wf.waiting_approval }} 个 SEO 工作流停在人工闸门，等你审批 ›</a>{% endif %}
+<section class="stats">
+    <a class="stat" href="/">
+      <div class="stat-icon" style="background:var(--tint-blue)">📄</div>
+      <div class="label">学习任务总数</div>
+      <div class="num" id="stat-tasks">{{ d.stats.tasks_total }}</div>
+      <div class="delta">已完成 {{ d.stats.tasks_done }} · 完成率 {{ d.stats.completion_rate }}%</div>
     </a>
-    {% endfor %}
-  </div>
-</section>
-<section class="card reveal">
-  <div class="card-head">
-    <h2>知识看板</h2>
-    <span class="badge badge-sample">示例数据</span>
-  </div>
-  <div class="kanban">
-    {% for column in kanban %}
-    <div class="col">
-      <div class="col-header tone-{{ column.tone }}">{{ column.title }}</div>
-      {% for item in column["items"] %}
-      <div class="item">{{ item }}</div>
-      {% endfor %}
+    <a class="stat" href="/sitemap">
+      <div class="stat-icon" style="background:var(--tint-green)">📚</div>
+      <div class="label">知识页面</div>
+      <div class="num">{{ d.stats.pages }}</div>
+      <div class="delta">{{ d.stats.page_groups }} 个分类</div>
+    </a>
+    <a class="stat" href="/ai">
+      <div class="stat-icon" style="background:var(--tint-indigo)">🤖</div>
+      <div class="label">智能体任务完成</div>
+      <div class="num">{{ d.stats.agent_runs }}</div>
+      <div class="delta">已注册 {{ d.stats.agent_count }} 个 Agent（累计）</div>
+    </a>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--tint-amber)">📈</div>
+      <div class="label">平均学习进度</div>
+      <div class="num">{{ d.stats.avg_progress|round|int }}<small>%</small></div>
+      <div class="delta" style="color:var(--warn)">● 专注度 {{ d.stats.focus }} 分</div>
     </div>
-    {% endfor %}
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-header"><h2>📋 知识看板 (Kanban)</h2><a href="/">查看全部 ›</a></div>
+      <div class="kanban">
+        {% for col in d.columns %}
+        <div class="col">
+          <div class="col-header" style="background:{{ col.color }}">{{ col.label }} <span>{{ col.count }}</span></div>
+          {% for t in col['items'] %}
+          <div class="item">{{ t.title }}
+            <div class="tag">{% if col.key in ('in_progress', 'review') %}<span>{{ t.progress }}%</span>{% endif %}<span>优先级：{{ {'high':'高','medium':'中','low':'低'}.get(t.priority, '中') }}</span></div>
+            {% if col.key in ('in_progress', 'review') %}<div class="bar"><i style="width:{{ t.progress }}%"></i></div>{% endif %}
+          </div>
+          {% else %}
+          <div class="empty">暂无任务</div>
+          {% endfor %}
+          {% if col.more %}<div class="more">还有 {{ col.more }} 项…</div>{% endif %}
+          <button class="add-btn" type="button" data-status="{{ col.key }}">+ 添加任务</button>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2>🔄 SEO 工作流阶段</h2><a href="/workflow-runs">审批台 ›</a></div>
+      <div class="flow">
+        {% for s in d.workflow.stages %}
+        <div class="flow-step{% if loop.index < d.workflow.current_stage %} done{% elif loop.index == d.workflow.current_stage %} current{% endif %}"><div class="icon">{{ s.icon }}</div><div class="num">{{ s.num }}</div><div class="name">{{ s.name }}<span class="desc">{{ s.desc }}</span>{% if loop.index == d.workflow.current_stage %}<span class="now">● 进行中</span>{% endif %}</div></div>
+        {% if not loop.last %}<span class="flow-arrow">→</span>{% endif %}
+        {% endfor %}
+      </div>
+      <div class="progress"><i style="width:{{ d.workflow.percent }}%"></i></div>
+      <a class="wf-live" href="/workflow-runs"><span>⚙️ LangGraph 工作流</span><span>{{ d.wf.total }} 次运行 · <b>{{ d.wf.waiting_approval }}</b> 待审批 · {{ d.wf.completed }} 完成</span></a>
+      <div class="progress-label">当前阶段 {{ d.workflow.current_stage }}/{{ d.workflow.stages|length }} · {{ d.workflow.percent }}%</div>
+    </section>
   </div>
-</section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-header"><h2>🤖 多智能体协作 (Multi-Agent)</h2><a href="/agent-architecture">架构与路线图 ›</a></div>
+      {% set ag = d.agents %}
+      <div class="agents">
+        {% if ag|length > 0 %}<div class="agent-box">{{ ag[0].icon }} {{ ag[0].name }}<div class="role">{{ ag[0].role }}</div></div>{% endif %}
+        <div class="agent-box center">协调智能体<div class="role">任务分配与调度</div></div>
+        {% if ag|length > 1 %}<div class="agent-box">{{ ag[1].icon }} {{ ag[1].name }}<div class="role">{{ ag[1].role }}</div></div>{% endif %}
+      </div>
+      <div class="agents" style="margin-top:8px">
+        {% for a in ag[2:] %}<div class="agent-box">{{ a.icon }} {{ a.name }}<div class="role">{{ a.role }}</div></div>{% endfor %}
+      </div>
+      <div class="agent-meta">Supervisor 规则路由 + LangGraph 流水线 + 人工闸门 · 后端已注册 {{ d.stats.agent_count }} 个 Agent，已完成 {{ d.stats.agent_runs }} 次任务</div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2>🧠 心理学洞察（最小化卡片）</h2><a href="/minimal-psych">查看全部 ›</a></div>
+      <div class="psych">
+        {% for p in d.psych %}
+        <div class="psych-item"><div class="score tone" style="--tone:{{ p.color }};--tone-dark:{{ p.color_dark }}">{{ p.score }}分</div><div class="label">{{ p.label }}</div><div class="status tone" style="--tone:{{ p.color }};--tone-dark:{{ p.color_dark }}">● {{ p.level }}</div></div>
+        {% endfor %}
+      </div>
+      {% if d.tip %}<div class="tip">💡 小贴士：{{ d.tip }}</div>{% endif %}
+    </section>
+  </div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+<script>
+document.querySelectorAll(".add-btn").forEach(btn => btn.addEventListener("click", async () => {
+  const title = prompt("新任务标题（最多 80 字）");
+  if (title === null) return;
+  await SEO.withButton(btn, async () => {
+    try {
+      await SEO.postJSON("/api/tasks", {title, status: btn.dataset.status});
+      SEO.toast("已添加任务，正在刷新…", "ok");
+      setTimeout(() => location.reload(), 600);
+    } catch (e) {
+      SEO.toast("添加失败：" + e.message, "error");
+    }
+  }, "添加中…");
+}));
+</script>
 {% endblock %}

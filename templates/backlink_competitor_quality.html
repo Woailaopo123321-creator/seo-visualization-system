@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}竞品外链质量分析{% endblock %}
+{% block heading %}竞品外链质量分析{% endblock %}
+{% block related %}<a href="/backlink-competitor">结构分析</a><a href="/backlink-quality">质量指标</a><a href="/backlink">策略</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.high { border-left-color: #059669; }
+.mid { border-left-color: #d97706; }
+.low { border-left-color: #dc2626; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+th { background: var(--surface-2); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>质量分层（相关性优先模型）</h2>
+    <div class="note high"><strong>高价值链接</strong>主题高度相关 + 正文编辑性位置 + 真实流量 + 自然锚文本。值得优先复制或超越。</div>
+    <div class="note mid"><strong>中等链接</strong>相关性尚可但位置一般，或权威高但主题弱。可选择性跟进，需人工确认。</div>
+    <div class="note low"><strong>低价值 / 风险</strong>不相关、页脚模板、付费未标记、垃圾邻里、精确匹配锚文本过高。跳过，不复制。</div>
+  </div>
+
+  <div class="card">
+    <h2>竞品链接质量评估维度</h2>
+    <table>
+      <tr><th>维度</th><th>高价值信号</th><th>低价值信号</th><th>权重</th></tr>
+      <tr><td>主题相关性</td><td>直接覆盖细分领域</td><td>泛泛或无关</td><td>30%</td></tr>
+      <tr><td>编辑性位置</td><td>正文 / 资源页</td><td>页脚 / 侧边栏 / 全站</td><td>20%</td></tr>
+      <tr><td>真实流量</td><td>稳定有机流量</td><td>无流量或突降</td><td>15%</td></tr>
+      <tr><td>锚文本自然度</td><td>品牌 / 通用 / 部分匹配</td><td>精确匹配过高</td><td>15%</td></tr>
+      <tr><td>权威分数</td><td>相对竞争水平</td><td>仅作辅助</td><td>10%</td></tr>
+      <tr><td>链接邻里</td><td>周围链接相关</td><td>垃圾出站多</td><td>10%</td></tr>
+    </table>
+    <p class="muted">阈值 0.70：高于此值优先外展；低于则需提升相关性或位置后再考虑。</p>
+  </div>
+
+  <div class="card">
+    <h2>竞品画像模式识别</h2>
+    <div class="grid-2">
+      <div class="note high"><strong>数据驱动型</strong>大量原创研究、调查、基准报告获链。复制策略：发布更好数据。</div>
+      <div class="note high"><strong>资源页型</strong>进入行业列表与工具综述。复制策略：申请加入或创建更全资源。</div>
+      <div class="note mid"><strong>媒体 PR 型</strong>新闻稿、采访、行业报道。复制策略：寻找类似新闻钩子。</div>
+      <div class="note low"><strong>规模化低质型</strong>大量目录、评论、交换链接。不复制：SpamBrain 通常抵消。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>差距列表质量过滤流程</h2>
+    <ol style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>导出链接到 2+ 竞争对手的域名</li>
+      <li>按主题相关性初筛（人工或规则）</li>
+      <li>检查链接位置与锚文本</li>
+      <li>应用加权评分模型（阈值 0.70）</li>
+      <li>排除付费未标记与垃圾邻里</li>
+      <li>输出优先外展列表，HITL 确认</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>backlink_quality_score 工具可直接应用于竞品差距列表。</li>
+      <li>可扩展研究工具输出竞品链接质量分层统计。</li>
+      <li>记忆提取可沉淀「竞品高价值链接模式」与「应避免的低质模式」。</li>
+      <li>所有外展决策仍需人工闸门。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">分析竞品外链质量的目标不是复制数量，而是识别高相关性、编辑性链接的模式，并过滤掉低价值与风险链接。质量分层决定外展优先级。</p>
+  </div>
+</div>
+{% endblock %}
