@@ -6,9 +6,13 @@
   <title>{% block title %}系统概览{% endblock %} · SEO 学习可视化系统</title>
   <meta name="description" content="{% block description %}SEO 学习可视化：外链评分、知识笔记和自动化工作流。{% endblock %}">
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">跳到正文</a>
 {% set current = '/dashboard' if active_path == '/' else active_path %}
 <aside class="sidebar">
   <a class="logo" href="/dashboard">
@@ -32,9 +36,9 @@
   <footer class="footer">外链外展必须经过人工确认（HITL）。质量阈值 0.70。</footer>
 </main>
 {% block chart_lib %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" defer></script>
 {% endblock %}
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

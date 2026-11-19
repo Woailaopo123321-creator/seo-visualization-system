@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+from functools import lru_cache
 from typing import Any
 
 from agents.scoring import (
@@ -23,10 +25,21 @@ from .sample_data import (
     knowledge_content,
 )
 
-PASS_COLOR = "#059669"
-FAIL_COLOR = "#e11d48"
-THRESHOLD_COLOR = "#c2410c"
-PALETTE = ["#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#8b5cf6", "#f43f5e", "#64748b"]
+PASS_COLOR = "#047857"
+FAIL_COLOR = "#be123c"
+THRESHOLD_COLOR = "#b45309"
+PALETTE = ["#0f766e", "#0e7490", "#b45309", "#047857", "#0369a1", "#be123c", "#64748b"]
+
+
+@lru_cache(maxsize=1)
+def _cached_sample_run() -> dict[str, Any]:
+    """示例工作流是确定性的，缓存后避免每个 API 重复跑一遍。"""
+
+    return SEOWorkflowReAct().run()
+
+
+def _sample_run() -> dict[str, Any]:
+    return copy.deepcopy(_cached_sample_run())
 
 FIELD_LABELS = {
     "discovered_targets": "发现目标",
@@ -288,7 +301,7 @@ def build_anchors() -> dict[str, Any]:
 def build_tools() -> dict[str, Any]:
     """四工具流程，外加任务对应的外部工具建议。"""
 
-    run = SEOWorkflowReAct().run()
+    run = _sample_run()
     observations = _observations(run)
     return {
         "caption": "四个阶段来自示例运行。观察数字是工具内置的示例数据，顺序是 ReAct 循环跑出来的。",
@@ -331,7 +344,7 @@ def build_knowledge() -> dict[str, Any]:
 def build_workflow() -> dict[str, Any]:
     """跑一次示例工作流，整理成步骤和得分构成。"""
 
-    run = SEOWorkflowReAct().run()
+    run = _sample_run()
     observations = _observations(run)
     scoring = observations.get("scoring", {})
     return {

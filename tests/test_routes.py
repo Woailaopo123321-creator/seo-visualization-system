@@ -59,6 +59,9 @@ def test_dashboard_chinese_content_sections(client):
     assert "研究智能体" in html
     assert "先意图，后技巧" in html
     assert "人工确认防冒进" in html
+    assert "skip-link" in html
+    assert "Noto+Serif+SC" in html
+    assert "insight-grid" in html
 
 
 def test_knowledge_page_covers_promised_topics(client):
@@ -109,6 +112,18 @@ def test_api_keeps_chinese_characters(client):
     assert response.status_code == 200
     assert "\\u" not in body
     assert "人工确认" in body
+
+
+def test_sample_workflow_payload_is_cached():
+    from seo_app.services import _cached_sample_run, _sample_run
+
+    _cached_sample_run.cache_clear()
+    first = _sample_run()
+    second = _sample_run()
+    assert first == second
+    assert _cached_sample_run.cache_info().hits >= 1
+    first["answer"]["summary"] = "mutated"
+    assert _sample_run()["answer"]["summary"] != "mutated"
 
 
 def test_entrypoint_app_serves_health():

@@ -1,5 +1,5 @@
 (function () {
-  const COLORS = ["#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#8b5cf6", "#f43f5e", "#64748b"];
+  const COLORS = ["#0f766e", "#0e7490", "#b45309", "#047857", "#0369a1", "#be123c", "#64748b"];
 
   function escapeHTML(value) {
     return String(value)
@@ -45,7 +45,7 @@
     if (typeof Chart === "undefined") {
       throw new Error("图表库未能加载，请检查网络后刷新");
     }
-    Chart.defaults.font.family = '"WenQuanYi Micro Hei", "Droid Sans Fallback", "PingFang SC", sans-serif';
+    Chart.defaults.font.family = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
     Chart.defaults.color = "#334155";
     Chart.defaults.plugins.legend.labels.boxWidth = 12;
   }
@@ -98,6 +98,7 @@
     const options = {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 450 },
       indexAxis: spec.horizontal ? "y" : "x",
       plugins: { legend: { display: spec.legend !== false, position: "bottom" } },
     };
@@ -160,7 +161,39 @@
     };
   }
 
+  function scoreLocally(features, weights, threshold, priority) {
+    let total = 0;
+    const breakdown = [];
+    Object.keys(weights).forEach((key) => {
+      const weight = Number(weights[key]);
+      const value = Number(features[key] || 0);
+      total += value * weight;
+      breakdown.push({
+        key,
+        label: key,
+        weight,
+        value: Math.round(value * 10000) / 10000,
+        contribution: Math.round(value * weight * 10000) / 10000,
+      });
+    });
+    const quality = Math.round(total * 100) / 100;
+    const passed = quality >= Number(threshold);
+    return {
+      quality_score: quality,
+      threshold: Number(threshold),
+      passed,
+      requires_hitl: true,
+      priority: priority || "相关性 > 编辑性 > 流量",
+      human_gate: passed
+        ? "已达阈值，可以进入外展候选，发出前必须人工确认"
+        : "未达阈值。若仍要联系，必须人工确认",
+      breakdown,
+      feature_source: "本地试算",
+    };
+  }
+
   window.SEOViz = {
+    COLORS,
     escapeHTML,
     fetchJSON,
     showError,
@@ -172,5 +205,6 @@
     renderFields,
     renderTable,
     debounce,
+    scoreLocally,
   };
 })();

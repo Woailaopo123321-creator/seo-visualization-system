@@ -2,19 +2,19 @@
 {% from "macros.html" import chart_card %}
 {% block title %}系统概览{% endblock %}
 {% block content %}
-<header class="page-header">
+<header class="page-header reveal">
   <p class="eyebrow">总览</p>
   <h1>系统概览</h1>
   <p class="lede">中文学习台：外链分析、多智能体协作、心理学洞察、SEO 知识笔记和自动化工作流。图表在加载后显示。</p>
 </header>
-<p class="callout">达到 {{ threshold }} 的目标进入外展候选，发出前仍要人工确认。</p>
+<p class="callout reveal">达到 {{ threshold }} 的目标进入外展候选，发出前仍要人工确认。</p>
 <div id="page-alert" class="page-alert" role="status">正在加载数据…</div>
-<div id="stats" class="stats"></div>
-<div class="layout-2">
+<div id="stats" class="stats reveal"></div>
+<div class="layout-2 reveal">
   {{ chart_card("weights-chart", "维度权重") }}
   {{ chart_card("candidates-chart", "示例候选质量分") }}
 </div>
-<section class="card">
+<section class="card reveal">
   <div class="card-head">
     <h2>工作流阶段</h2>
     <span class="badge badge-live">流程</span>
@@ -25,12 +25,12 @@
     {% endfor %}
   </ol>
 </section>
-<section>
+<section class="reveal">
   <h2 class="section-title">多智能体协作</h2>
   <p class="hint">四个角色按研究 → 差距 → 评分 → 验证接力，最后仍交给人工确认。</p>
-  <div class="link-grid">
+  <div class="insight-grid">
     {% for agent in agents %}
-    <article class="link-card">
+    <article class="insight">
       <strong>{{ agent.name }}</strong>
       <span class="mono">{{ agent.role }}</span>
       <span>{{ agent.duty }}</span>
@@ -38,19 +38,19 @@
     {% endfor %}
   </div>
 </section>
-<section>
+<section class="reveal">
   <h2 class="section-title">心理学洞察</h2>
   <p class="hint">把学习与外展节奏压到可读、可复核的步骤上，避免工具噪音掩盖判断。</p>
-  <div class="link-grid">
+  <div class="insight-grid">
     {% for item in psychology %}
-    <article class="link-card">
+    <article class="insight">
       <strong>{{ item.title }}</strong>
       <span>{{ item.text }}</span>
     </article>
     {% endfor %}
   </div>
 </section>
-<section>
+<section class="reveal">
   <h2 class="section-title">页面</h2>
   <div class="link-grid">
     {% for item in nav_items if item.path != '/dashboard' %}
@@ -61,7 +61,7 @@
     {% endfor %}
   </div>
 </section>
-<section class="card">
+<section class="card reveal">
   <div class="card-head">
     <h2>知识看板</h2>
     <span class="badge badge-sample">示例数据</span>
@@ -79,5 +79,5 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
 {% endblock %}
