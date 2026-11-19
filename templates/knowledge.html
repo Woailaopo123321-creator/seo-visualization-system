@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros.html" import chart_card %}
+{% block title %}SEO 知识{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="eyebrow">学习笔记</p>
+  <h1>SEO 知识</h1>
+  <p class="lede">{{ knowledge.intro }}</p>
+</header>
+<nav class="subnav" aria-label="笔记目录">
+  <a href="#algorithm">2026 算法</a>
+  <a href="#aio">AI Overviews</a>
+  <a href="#eeat">E-E-A-T</a>
+  <a href="#tools">工具对比</a>
+</nav>
+<div id="page-alert" class="page-alert" role="status">正在加载图表…</div>
+<div class="layout-2">
+  <section class="card" id="algorithm">
+    <h2>{{ knowledge.algorithm.title }}</h2>
+    <p>{{ knowledge.algorithm.summary }}</p>
+    <ul class="dim-list">
+      {% for point in knowledge.algorithm.points %}
+      <li>{{ point }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {{ chart_card("comparison-chart", "笔记里的“强”项") }}
+</div>
+<section class="card" id="aio">
+  <h2>{{ knowledge.aio.title }}</h2>
+  <p>{{ knowledge.aio.summary }}</p>
+  <ul class="dim-list">
+    {% for point in knowledge.aio.points %}
+    <li>{{ point }}</li>
+    {% endfor %}
+  </ul>
+</section>
+<section class="card" id="eeat">
+  <h2>{{ knowledge.eeat.title }}</h2>
+  <p>{{ knowledge.eeat.summary }}</p>
+  <div class="pillar-grid">
+    {% for pillar in knowledge.eeat.pillars %}
+    <article>
+      <h3>{{ pillar.label }}</h3>
+      <p class="mono">{{ pillar.key }}</p>
+      <p>{{ pillar.text }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+<section class="card" id="tools">
+  <div class="card-head">
+    <h2>{{ knowledge.tools.title }}</h2>
+    <span class="badge badge-sample">{{ knowledge.tools.badge }}</span>
+  </div>
+  <p>{{ knowledge.tools.summary }}</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>工具</th>
+          {% for scene in knowledge.tools.scenes %}
+          <th>{{ scene }}</th>
+          {% endfor %}
+          <th>适合放在哪</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in knowledge.tools.rows %}
+        <tr>
+          <td>{{ row.tool }}</td>
+          {% for rating in row.ratings %}
+          <td><span class="rate rate-{{ rating }}">{{ rating }}</span></td>
+          {% endfor %}
+          <td>{{ row.fit }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <h3 class="section-title">按任务选择</h3>
+  <div class="link-grid">
+    {% for item in knowledge.agent_recommendations %}
+    <article class="link-card">
+      <strong>{{ item.task_label }} · {{ item.recommended }}</strong>
+      <span>{{ item.reason }}</span>
+      <span>{{ item.human_gate }}</span>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/knowledge.js') }}"></script>
+{% endblock %}
