@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}2026 SEO 深度洞察{% endblock %}
+{% block heading %}2026 SEO 深度洞察{% endblock %}
+{% block related %}<a href="/seo">SEO</a><a href="/aeo-geo">AEO/GEO</a><a href="/seo-workflow">工作流</a><a href="/eeat">E-E-A-T</a>{% endblock %}
+{% block head %}
+<style>
+.pillar { background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.pillar strong { display: block; margin-bottom: 4px; }
+.tag { display: inline-block; background: var(--tint-indigo); color: var(--ink-indigo); font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>AI Overviews & AEO/GEO</h2>
+    <div class="pillar">
+      <strong>核心事实（2026）</strong>
+      AI Overviews 覆盖约 47–50% 美国搜索。目标从“排名”转向“被引用与提及”。早期数据仅约 38% 引用来自 Top 10。
+      <div style="margin-top:6px;"><span class="tag">40-60字直接答案</span><span class="tag">130-170字段落</span><span class="tag">原创统计</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>November 2026 Core Update</h2>
+    <div class="pillar">
+      <strong>11月10日开始滚动</strong>
+      第三次核心更新。奖励原创、有帮助、满足用户的内容。无特定目标，需等待完整 rollout 后再评估。
+    </div>
+  </div>
+  <div class="card">
+    <h2>主题权威与实体 SEO</h2>
+    <div class="pillar">
+      <strong>支柱 + 集群架构</strong>
+      一个深度支柱页 + 多个子主题集群页，强内部链接，形成主题覆盖。
+    </div>
+    <div class="pillar">
+      <strong>实体信号</strong>
+      作者实体（真实经历 + 可验证资料）、组织 schema、sameAs 外部身份、品牌外部提及。
+    </div>
+  </div>
+  <div class="card">
+    <h2>E-E-A-T 2026 重点</h2>
+    <div class="pillar">
+      Trust 仍是核心。Experience（第一手经验、原创数据）比单纯 Expertise 更关键。AI 生成内容必须经过人工审核与事实校验。
+    </div>
+  </div>
+  <div class="card">
+    <h2>技术与体验</h2>
+    <div class="pillar">
+      Core Web Vitals（LCP ≤2.5s、INP ≤200ms、CLS ≤0.1）以 CrUX 字段数据 p75 为准。效果有限但为必要条件。结构化数据必须与可见文本一致。
+    </div>
+  </div>
+  <div class="card">
+    <h2>Agent 安全边界</h2>
+    <div class="pillar">
+      只读审计、草稿、建议可自动化。任何发布、重定向、规模内容修改必须人工确认。防止规模化低价值内容与幻觉传播。
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}本系统多 AI 架构与路线图{% endblock %}
+{% block heading %}🏗️ 本系统多 AI 自动化架构与路线图{% endblock %}
+{% block subheading %}Supervisor 路由 + 确定性流水线 + 并行审计 + 真正的人工闸门{% endblock %}
+{% block related %}<a href="/workflow-runs">工作流审批台</a><a href="/agent-patterns">模式与框架对比</a><a href="/multi-agent">分布式 Agent</a><a href="/langgraph-state">LangGraph 状态</a>{% endblock %}
+{% block head %}
+<style>
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.metric b { display: block; font-size: 24px; }
+.metric .was { font-size: 12px; color: var(--muted); }
+.metric .now { font-size: 12px; color: var(--ink-green); font-weight: 600; margin-top: 2px; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 8px; padding: 3px; gap: 2px; }
+.seg button { background: transparent; color: var(--muted); padding: 5px 14px; font-size: 13px; }
+.seg button.on { background: var(--card); color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,.08); font-weight: 600; }
+.diagram { padding: 10px 0; }
+.layer { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.arrow { text-align: center; color: var(--faint); font-size: 18px; line-height: 1.6; }
+.node { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 10px 14px; min-width: 150px; text-align: center; font-size: 13px; position: relative; }
+.node b { display: block; font-size: 14px; }
+.node .d { display: block; color: var(--muted); font-size: 12px; }
+.node .st { display: inline-block; margin-top: 6px; }
+.node.main { border-color: var(--accent); background: var(--accent-soft); }
+.node.gate { border-color: #f59e0b; background: var(--tint-amber); }
+.node.ui { border-color: var(--text); }
+.node.future { border-style: dashed; }
+.node.bad { border-color: var(--line-red); background: var(--tint-red); }
+.loop { font-size: 11px; color: var(--ink-purple); display: block; margin-top: 4px; }
+.roadmap { list-style: none; padding: 0; counter-reset: s; }
+.roadmap li { display: grid; grid-template-columns: 36px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+.roadmap li:last-child { border-bottom: none; }
+.roadmap .n { width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); }
+.roadmap .n.done { background: #10b981; color: #fff; }
+.roadmap .n.now { background: var(--accent); color: #fff; }
+.roadmap b { font-size: 14px; }
+.roadmap p { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
+.keys ul { font-size: 14px; }
+.keys li { margin: 4px 0; }
+@media (max-width: 760px) { .metrics { grid-template-columns: repeat(2, 1fr); } .node { min-width: 130px; flex: 1 1 40%; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info"><strong>核心结论：</strong>不要把 SEO 工作流改成让模型自由选步骤——它本来就是 17 步固定管线，只是套了 ReAct 外壳。正确做法是落在 LangGraph 节点上，配上真正会暂停的 HITL；评分、编排和闸门用代码完成，LLM 只进需要判断的节点。来源：<a href="{{ report_url }}" target="_blank" rel="noopener">多 AI 自动化架构学习报告 ↗</a></div>
+
+  <div class="card">
+    <h2>现有系统诊断（改造前 → 现在）</h2>
+    <div class="metrics">
+      <div class="metric"><b>7</b><div class="was">已注册 Agent（Coordinator 星型调度）</div><div class="now">保留，映射为 Supervisor 的专家</div></div>
+      <div class="metric"><b>17</b><div class="was">工作流固定阶段（ReAct 外壳）</div><div class="now">✔ 已改为 LangGraph 图节点</div></div>
+      <div class="metric"><b>9 → 4+2</b><div class="was">human_gate 字符串标记，只标注不暂停</div><div class="now">✔ 4 个必选 + 2 个可选 interrupt 闸门</div></div>
+      <div class="metric"><b>0</b><div class="was">真实 LLM 调用（think() 全部写死）</div><div class="now">按计划保持 0，接入点已标注</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <h2 style="margin:0">架构图</h2>
+      <div class="seg" role="group" aria-label="架构图版本"><button type="button" data-v="before" aria-pressed="false">改造前</button><button type="button" data-v="after" class="on" aria-pressed="true">目标 / 现在</button></div>
+    </div>
+    <div class="diagram" id="d-before" hidden>
+      <div class="layer"><div class="node main"><b>Coordinator</b><span class="d">分发、缓存、超时</span></div></div>
+      <div class="arrow">↓ ↓ ↓</div>
+      <div class="layer">
+        <div class="node"><b>学习类 Agent</b><span class="d">进度 / 导图 / 推荐</span></div>
+        <div class="node"><b>ReAct 外壳 Agent</b><span class="d">think() 按步数写死</span></div>
+        <div class="node"><b>SEOWorkflow</b><span class="d">固定 17 步序列</span></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer">
+        <div class="node"><b>示例数据工具</b><span class="d">未接真实 API</span></div>
+        <div class="node bad"><b>human_gate</b><span class="d">只写在结果里，不暂停</span></div>
+      </div>
+      <p class="muted" style="text-align:center;margin-top:10px">旧版仍保留在 <a href="/seo-workflow">/seo-workflow</a>（兼容模式）。</p>
+    </div>
+    <div class="diagram" id="d-after">
+      <div class="layer"><div class="node ui"><b>Flask 界面</b><span class="d">审批台与轨迹</span><span class="st pill ok">✔ <a href="/workflow-runs">已落地</a></span></div></div>
+      <div class="arrow">↓</div>
+      <div class="layer"><div class="node main"><b>Supervisor</b><span class="d">规则路由与汇总（Coordinator）</span><span class="st pill ok">✔ 规则路由</span></div></div>
+      <div class="arrow">↓ ↓ ↓ ↓</div>
+      <div class="layer">
+        <div class="node main"><b>SEO 流水线图</b><span class="d">17 个确定性节点 + 并行审计</span><span class="st pill ok">✔ LangGraph</span></div>
+        <div class="node"><b>E-E-A-T 审计</b><span class="d">作者 / 经验 / 信任</span><span class="st pill info">现有 Agent</span></div>
+        <div class="node"><b>学习分析</b><span class="d">进度与路径</span><span class="st pill info">现有 Agent</span></div>
+        <div class="node future"><b>简报撰写 ⇄ 评审</b><span class="d">生成-评审循环（有上限）</span><span class="loop">↺ 当前由人工「打回重写」代替</span><span class="st pill warn">需 LLM</span></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer"><div class="node gate"><b>interrupt 闸门</b><span class="d">批准 / 修改 / 拒绝 → Command(resume) 恢复</span><span class="st pill ok">✔ 4 必选 + 2 可选</span></div></div>
+      <div class="arrow">↓</div>
+      <div class="layer">
+        <div class="node future"><b>MCP 工具</b><span class="d">Search Console、页面抓取等实数据</span><span class="st pill warn">阶段 2 · 接口已预留</span></div>
+        <div class="node"><b>状态与记忆</b><span class="d">Checkpoint ✔（SQLite）· Store 待接</span><span class="st pill ok">✔ 检查点</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>建议的 Agent 角色</h2>
+      <div class="table-wrap"><table>
+        <tr><th>角色</th><th>职责</th><th>LLM?</th></tr>
+        <tr><td>Supervisor / Router</td><td>按请求类型路由、汇总；不做 SEO 专业工作</td><td>早期用规则</td></tr>
+        <tr><td>SEO 流水线图</td><td>17 个确定性节点，遇闸门就中断</td><td>大部分不需要</td></tr>
+        <tr><td>E-E-A-T 审计员</td><td>作者、经验、信任三项并行，再出报告</td><td>报告叙事可用</td></tr>
+        <tr><td>学习分析员</td><td>读看板任务，给进度建议</td><td>指标不需要</td></tr>
+        <tr><td>简报撰写员</td><td>根据关键词与主题集群写简报</td><td><span class="pill warn">需要</span></td></tr>
+        <tr><td>评审员</td><td>按 E-E-A-T 与引用准备度批改简报</td><td><span class="pill warn">需要</span></td></tr>
+        <tr><td>外链分析员</td><td>调研、差距、质量评分；外展前必须过闸门</td><td>评分不需要</td></tr>
+        <tr><td>记忆整理员</td><td>提取偏好与站点事实到 Store</td><td><span class="pill warn">真实提取需要</span></td></tr>
+      </table></div>
+    </div>
+    <div class="card">
+      <h2>人工闸门放在哪里</h2>
+      <div class="table-wrap"><table>
+        <tr><th>闸门</th><th>人要做的事</th><th>本系统</th></tr>
+        <tr><td>关键词优先级</td><td>确认或改写优先词</td><td><span class="pill ok">✔ 已实现</span></td></tr>
+        <tr><td>内容简报</td><td>通过、修改或打回重写</td><td><span class="pill ok">✔ 已实现</span></td></tr>
+        <tr><td>发布前</td><td>最终确认</td><td><span class="pill ok">✔ 已实现</span></td></tr>
+        <tr><td>外链外展</td><td>筛选目标后才允许外联</td><td><span class="pill ok">✔ 已实现</span></td></tr>
+        <tr><td>查询扇出子问题</td><td>确认要覆盖的子问题</td><td><span class="pill ok">✔ 可选闸门（启动时勾选）</span></td></tr>
+        <tr><td>外链数据工具</td><td>确认用哪个外部工具（接入后有费用）</td><td><span class="pill ok">✔ 可选闸门（启动时勾选）</span></td></tr>
+      </table></div>
+      <p class="muted" style="margin-top:8px">不要把纯计算（进度指标、引用概率公式）塞进 HITL。审批接口沿用 SEO_ADMIN_TOKEN 写保护。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>状态设计（已实现）</h2>
+    <p style="font-size:14px">一次运行 = 一个 <code>thread_id</code>。共享状态（TypedDict）：<code>site</code>、<code>topic</code>、<code>current_stage</code>、<code>artifacts</code>（各阶段产出，字典合并）、<code>scores</code>（引用概率、外链质量）、<code>approvals</code>（审批记录）、<code>trajectory</code>（轨迹，列表追加）、<code>errors</code>、<code>brief_revision</code>。并行节点不写 <code>current_stage</code>，避免同一超步冲突。现有 30 秒结果缓存不用于工作流（带副作用 / 待审批结果不能缓存）。</p>
+  </div>
+
+  <div class="card">
+    <h2>分阶段路线图</h2>
+    <ol class="roadmap">
+      <li><span class="n done">0</span><div><b>保持外壳 <span class="pill ok">✔ 完成</span></b><p>不推翻 Flask 界面、鉴权与现有测试。不需要 LLM 密钥。</p></div></li>
+      <li><span class="n done">1</span><div><b>图化工作流 <span class="pill ok">✔ 完成</span></b><p>LangGraph 改写 SEO 工作流：17 个节点、共享 State、SqliteSaver 检查点、interrupt 接入<a href="/workflow-runs">审批台</a>；工具仍为示例数据。不需要 LLM 密钥。</p></div></li>
+      <li><span class="n now">2</span><div><b>接入真实工具 <span class="pill info">下一步</span></b><p>用 MCP 或官方 API 接 Google Search Console、页面抓取（实现 <code>workflow/tools.py</code> 的 StageTool 并 <code>register_tool()</code>）；Ahrefs / Semrush 有密钥后再接。一般不需要 LLM 密钥。</p></div></li>
+      <li><span class="n">3</span><div><b>局部接入 LLM <span class="pill warn">需密钥</span></b><p>只在简报撰写、扇出子问题、外展草稿、分析叙事等需要判断的节点用模型；开放探索才用真 ReAct。</p></div></li>
+      <li><span class="n">4</span><div><b>记忆与评估</b><p>接 LangMem / Store，用 LangSmith 或 Langfuse 追踪，用固定站点样例做离线评估。</p></div></li>
+      <li><span class="n">5</span><div><b>可选加固</b><p>有明确收益时加简报评审循环；拆分服务时再上 A2A；登录接口加失败次数限制。</p></div></li>
+    </ol>
+  </div>
+
+  <div class="grid-2 keys">
+    <div class="card"><h2>✅ 不需要密钥就能做</h2><ul>
+      <li>把工作流迁到 LangGraph + checkpointer <span class="pill ok">已完成</span></li>
+      <li>把 human_gate 改成真正的 interrupt + 审批台 <span class="pill ok">已完成</span></li>
+      <li>用规则做入口路由 <span class="pill ok">已完成</span></li>
+      <li>保留引用与外链评分公式、任务指标统计 <span class="pill ok">已保留</span></li>
+      <li>用 MCP 或官方 API 接只读数据（如 Search Console）</li>
+      <li>接入运行跟踪，沿用现有鉴权与测试</li>
+    </ul></div>
+    <div class="card"><h2>🔑 必须有密钥才能做</h2><ul>
+      <li>动态 think()，即真正的 ReAct</li>
+      <li>内容简报与思维导图生成</li>
+      <li>自然语言建议和查询扇出子问题生成</li>
+      <li>外展邮件草稿、评审循环</li>
+      <li>LangMem 式记忆提取，以及用大模型做软路由</li>
+    </ul><p class="muted">在没有密钥前，生成类节点不伪装成模型对话；页面上统一标注「模拟」。</p></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
+  document.getElementById("d-before").hidden = b.dataset.v !== "before";
+  document.getElementById("d-after").hidden = b.dataset.v !== "after";
+}));
+</script>
+{% endblock %}

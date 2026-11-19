@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}多智能体模式与框架对比{% endblock %}
+{% block heading %}🧩 多智能体模式与框架对比{% endblock %}
+{% block subheading %}来自《多 AI 自动化架构学习报告》（2026-11-19 调研）{% endblock %}
+{% block related %}<a href="/agent-architecture">本系统架构与路线图</a><a href="/workflow-runs">工作流审批台</a><a href="/multi-agent">分布式 Agent</a><a href="/langgraph">LangGraph</a>{% endblock %}
+{% block head %}
+<style>
+.fit-good { color: var(--ink-green); font-weight: 600; }
+.fit-warn { color: var(--ink-amber); font-weight: 600; }
+td small { color: var(--muted); }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.principles div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; }
+.principles b { display: block; margin-bottom: 4px; font-size: 14px; }
+.src li { margin: 4px 0; font-size: 13px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info"><strong>一句话结论：</strong>先选最简单的方案。步骤能预先写清楚的任务用「工作流」（预定义代码路径），只有路径真的难以预写时才用「智能体」（模型动态决定步骤）。本系统的 17 步 SEO 流水线属于前者。完整报告：<a href="{{ report_url }}" target="_blank" rel="noopener">多 AI 自动化架构学习报告 ↗</a></div>
+
+  <div class="card">
+    <h2>核心模式对比</h2>
+    <p class="muted" style="margin-bottom:8px">分类参考 Anthropic《Building effective agents》、LangChain 多智能体文档与 AWS 多智能体架构说明。</p>
+    <div class="table-wrap"><table>
+      <tr><th>模式</th><th>怎么跑</th><th>适合场景</th><th>主要风险</th><th>与本系统的契合</th></tr>
+      <tr><td><b>顺序流水线 / Prompt chaining</b></td><td>步骤预定，上步输出作为下步输入，中途可加程序闸门</td><td>任务可稳定拆解，需要可预测与可调试</td><td>延迟叠加；路径过硬遇异常会僵</td><td class="fit-good">最契合 → 已作为 SEO 工作流主骨架（<a href="/workflow-runs">审批台</a>）</td></tr>
+      <tr><td><b>Router</b></td><td>先分类输入，再交给专家 Agent，最后汇总</td><td>请求类型清晰：审计、路径、工作流、导图</td><td>分类错误会走错专家</td><td class="fit-good">很契合 → 已用规则实现（<a href="/ai">AI 中心 · 智能路由</a>）</td></tr>
+      <tr><td><b>Orchestrator-worker / Supervisor</b></td><td>中央 Agent 拆任务、委托工作者并汇总</td><td>开放式任务，需动态拆分或并行专家</td><td>监督者迷失会循环或重复派单，需轮次上限</td><td>契合 Coordinator 层；监督者不要自己做领域工作</td></tr>
+      <tr><td><b>分层 / Hierarchical</b></td><td>顶层拆解后，子智能体可以再拆</td><td>层级多、团队分工维护</td><td>调用链变长，成本与调试难度上升</td><td>现阶段不需要，一层 Supervisor 足够</td></tr>
+      <tr><td><b>并行扇出 / Parallelization</b></td><td>独立子任务并行后汇总，或多次投票</td><td>多领域审计、竞品对比、需提速</td><td>并发产生更多调用与费用</td><td class="fit-good">已用于段落 / 引用 / 扇出三项审计并行</td></tr>
+      <tr><td><b>Swarm / Handoff</b></td><td>控制权按专长交接</td><td>多轮对话，用户直接与专家交流</td><td>难并行；上下文逐渐膨胀</td><td class="fit-warn">不适合主工作流，可用于以后的对话咨询</td></tr>
+      <tr><td><b>Plan-and-execute</b></td><td>先出计划再执行，可按结果重规划</td><td>目标清楚但步骤可变的研究任务</td><td>计划质量差会浪费整个执行链</td><td>可用于竞品调研等开放任务，不用于 17 步管线</td></tr>
+      <tr><td><b>ReAct</b></td><td>思考 → 行动 → 观察循环，步骤由模型决定</td><td>工具多、路径难预写的探索</td><td>循环、重复调用、费用不可预知</td><td>保留轨迹展示；接 LLM 后才用于开放探索</td></tr>
+      <tr><td><b>Debate / Reflection（Evaluator-optimizer）</b></td><td>生成与评审循环，或多角色互评</td><td>评价标准清晰、迭代确能提质</td><td>多轮调用；标准含糊会空转</td><td>适合简报打磨（当前：人工「打回重写」最多 2 次）</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2>主要框架对比</h2>
+    <p class="muted" style="margin-bottom:8px">以官方文档及 2026 年可核对的对比整理，不是跑分榜。</p>
+    <div class="table-wrap"><table>
+      <tr><th>框架</th><th>控制模型</th><th>状态与记忆</th><th>HITL</th><th>MCP</th><th>更适合</th><th>许可</th></tr>
+      <tr><td><b class="fit-good">LangGraph（采用）</b></td><td>声明节点、边与共享状态；可嵌入子智能体、Router、Handoff</td><td>线程检查点 + 跨线程 Store；可配 LangMem</td><td>interrupt() + Command(resume)，依赖 checkpointer</td><td>经 LangChain MCP Adapter</td><td>需要明确控制流、可恢复流水线与审批点的系统</td><td>MIT</td></tr>
+      <tr><td><b>CrewAI</b></td><td>角色化 Crew；顺序或经理层级；Flows 事件驱动</td><td>任务输出下传；Flows 默认 SQLite 持久化</td><td>回调式，无图级中断原语</td><td>有集成</td><td>快速按角色搭团队</td><td>MIT</td></tr>
+      <tr><td><b>AutoGen / AG2</b></td><td>经典 GroupChat + Manager；AG2 v1 改为 workflow / TransitionGraph</td><td>默认偏内存</td><td>可人类参与对话，非检查点模型</td><td>有生态集成</td><td>会话式研究与多 Agent 讨论</td><td>见项目许可</td></tr>
+      <tr><td><b>OpenAI Agents SDK</b></td><td>Agent、Agent-as-tool、Handoff、Guardrail；控制流主要由模型决定</td><td>Sessions：SQLite、Redis、SQLAlchemy</td><td>工具 needs_approval，运行态可序列化后恢复</td><td>Hosted / Streamable HTTP / stdio</td><td>以 OpenAI 为主的轻量应用</td><td>MIT</td></tr>
+      <tr><td><b>Google ADK</b></td><td>协调器 + 子智能体；顺序、循环、并行模板；2.0 起有图工作流</td><td>Session、state、memory</td><td>工具确认与图中人工输入（部分实验性）</td><td>McpToolset</td><td>已标准化 GCP，或需 Go / Java</td><td>Apache 2.0</td></tr>
+    </table></div>
+    <p class="muted" style="margin-top:8px">选 LangGraph 的三个理由：① 17 步流水线需要可见的图与可恢复检查点；② HITL 要真正暂停而不是贴一行字；③ Flask 可以直接把 LangGraph 当库引入，不必换主框架。</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>状态与记忆</h2>
+      <p style="font-size:14px">短期记忆 = 线程（thread）状态，由 checkpointer 每个超步存快照；长期记忆跨会话，用 Store 按命名空间存储（如 <code>("prefs", user)</code>、<code>("site", domain)</code>）。生产环境用 Postgres 等持久化实现，InMemorySaver 仅供开发。</p>
+      <p class="muted">本系统：工作流运行态存 <code>data/workflow.sqlite</code>（SqliteSaver），与看板任务 JSON 分开。</p>
+    </div>
+    <div class="card">
+      <h2>MCP vs A2A</h2>
+      <p style="font-size:14px"><b>MCP</b> 是垂直的：让单个智能体连到工具、API 和资源。<b>A2A</b> 是水平的：让不同团队/组织的智能体互相发现与协作（Agent Card 在 <code>/.well-known/agent-card.json</code>）。</p>
+      <p class="muted">本系统：先用 MCP 接 Search Console、页面抓取等只读工具；只有拆分服务或对接外部 Agent 时才考虑 A2A，不要一开始就微服务化。</p>
+    </div>
+    <div class="card">
+      <h2>人机协同（HITL）</h2>
+      <p style="font-size:14px">LangGraph 用 <code>interrupt()</code> 暂停图并写入检查点，用 <code>Command(resume=...)</code> 恢复；恢复时节点会从头重跑，闸门前的副作用要保持幂等，并且需要稳定的 <code>thread_id</code>。</p>
+      <p class="muted">本系统：闸门是独立节点，interrupt 之前不做副作用 → <a href="/workflow-runs">审批台</a>。</p>
+    </div>
+    <div class="card">
+      <h2>评估、可观测与成本</h2>
+      <p style="font-size:14px">自主智能体意味着更高成本和误差叠加，需要沙箱、防护栏与最大迭代次数。应追踪每个节点、工具调用、token、延迟与错误（LangSmith，或 OpenTelemetry + Langfuse）。</p>
+      <div class="callout warn" style="margin:8px 0 0">⚠️ 别把 17 个阶段都换成 LLM 调用：评分公式、阶段编排、阈值判断保留为确定性代码。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Anthropic 的三条原则</h2>
+    <div class="principles">
+      <div><b>① 保持简单</b>能用工作流就不用自主智能体；复杂度要用效果换。</div>
+      <div><b>② 显式展示规划与轨迹</b>每一步做了什么、为什么，都要能看见（本系统的执行轨迹）。</div>
+      <div><b>③ 打磨工具接口</b>把工具当一等公民设计（本系统的可替换 StageTool 接口）。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>主要来源</h2>
+    <ol class="src">
+      <li><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic · Building effective agents</a></li>
+      <li><a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">Anthropic · How we built our multi-agent research system</a></li>
+      <li><a href="https://docs.langchain.com/oss/python/langchain/multi-agent" target="_blank" rel="noopener">LangChain · Multi-agent</a></li>
+      <li><a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents" target="_blank" rel="noopener">LangGraph · Workflows and agents</a></li>
+      <li><a href="https://docs.langchain.com/oss/python/langgraph/checkpointers" target="_blank" rel="noopener">LangGraph · Checkpointers</a> · <a href="https://docs.langchain.com/oss/python/langgraph/interrupts" target="_blank" rel="noopener">Interrupts</a> · <a href="https://docs.langchain.com/oss/python/langgraph/add-memory" target="_blank" rel="noopener">Memory</a></li>
+      <li><a href="https://a2a-protocol.org/latest/topics/a2a-and-mcp/" target="_blank" rel="noopener">A2A Protocol · A2A and MCP</a></li>
+      <li><a href="https://aws.amazon.com/marketplace/build-learn/ai-agent-learning-series/multi-agent-architectures/" target="_blank" rel="noopener">AWS · Multi-agent architectures</a></li>
+      <li><a href="https://openai.github.io/openai-agents-python/human_in_the_loop/" target="_blank" rel="noopener">OpenAI Agents SDK · Human-in-the-loop</a></li>
+      <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al. · ReAct (arXiv:2210.03629)</a></li>
+      <li><a href="{{ report_url }}" target="_blank" rel="noopener">完整学习报告（含框架对比与路线图）</a></li>
+    </ol>
+  </div>
+</div>
+{% endblock %}

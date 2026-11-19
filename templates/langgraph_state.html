@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}LangGraph 状态管理{% endblock %}
+{% block heading %}LangGraph 状态管理{% endblock %}
+{% block related %}<a href="/langgraph">LangGraph</a><a href="/ai-workflow">AI 工作流</a><a href="/consistency">一致性</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.state { border-left-color: #059669; }
+.check { border-left-color: #7c3aed; }
+.reducer { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info">✅ 实际例子：本系统工作流的共享 State（artifacts 字典合并、trajectory 列表追加、thread_id 每次运行）见 <a href="/agent-architecture">架构与路线图</a>，运行效果见 <a href="/workflow-runs">审批台</a>。</div>
+  <div class="card">
+    <h2>状态模型</h2>
+    <div class="note state"><strong>类型化状态</strong>使用 TypedDict、Pydantic 或 dataclass 定义。节点读取完整状态，返回部分更新（Partial State）。</div>
+    <div class="note state"><strong>共享账本</strong>状态不是可直接修改的内存，而是通过 reducer 记账的共享对象。节点提交增量，reducer 合并。</div>
+    <div class="note state"><strong>通道（Channel）</strong>每个状态键是一个通道。可配置独立 reducer 与默认值。</div>
+  </div>
+
+  <div class="card">
+    <h2>Reducer 机制</h2>
+    <div class="note reducer"><strong>合并规则</strong>节点不直接修改状态，只提交更新。Reducer 函数决定如何合并旧值与新更新（如列表追加、覆盖、自定义聚合）。</div>
+    <div class="note reducer"><strong>并行安全</strong>同一 super-step 中多个节点的更新通过 reducer 确定性合并，避免冲突。</div>
+    <div class="note reducer"><strong>示例</strong>消息列表常用 append reducer；计数器可用累加；自定义字段可覆盖或保留最新。</div>
+  </div>
+
+  <div class="card">
+    <h2>检查点与线程</h2>
+    <div class="grid-2">
+      <div class="note check"><strong>检查点</strong>每个 super-step 结束后保存完整状态快照。包含 channel_values、版本、元数据与父检查点引用。</div>
+      <div class="note check"><strong>线程</strong>thread_id 标识一次独立运行。多租户场景下每个对话或任务使用独立线程。</div>
+      <div class="note check"><strong>待写缓冲</strong>节点失败时，已完成节点的写入暂存为 pending writes，恢复时跳过已成功节点。</div>
+      <div class="note check"><strong>持久化模式</strong>async（默认后台写）、sync（逐步写）、exit（仅结束时写）。生产推荐数据库后端。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>短期 vs 长期记忆</h2>
+    <div class="note"><strong>Checkpointer</strong>线程内短期记忆。支持恢复、HITL 中断、时间旅行。范围：单次运行。</div>
+    <div class="note"><strong>Store</strong>跨线程长期记忆。存储用户偏好、事实、共享知识。节点可直接读写。</div>
+    <div class="note"><strong>组合使用</strong>Checkpointer 跟踪当前线程进度；Store 维护跨会话知识。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>当前系统使用进程内 TTL 缓存（30s）与 ReAct 轨迹日志。</li>
+      <li>若需跨请求恢复与 HITL 暂停，可评估引入检查点机制。</li>
+      <li>Reducer 思想可借鉴：节点返回增量，由协调层确定性合并。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">LangGraph 状态管理的核心是类型化共享状态 + reducer 合并 + 检查点持久化。节点只提交增量，系统保证确定性合并与可恢复执行。</p>
+  </div>
+</div>
+{% endblock %}

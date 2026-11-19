@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}竞争对手外链结构{% endblock %}
+{% block heading %}竞争对手外链结构{% endblock %}
+{% block related %}<a href="/backlink">策略</a><a href="/backlink-quality">质量评估</a><a href="/backlink-tools">三工具</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.gap { border-left-color: #059669; }
+.method { border-left-color: #7c3aed; }
+.warn { border-left-color: #d97706; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+th { background: var(--surface-2); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心方法：外链差距分析</h2>
+    <div class="note gap"><strong>定义</strong>找出链接到竞争对手但未链接到你的域名。这些站点已证明愿意在你的主题领域给出链接。</div>
+    <div class="note gap"><strong>Link Intersect</strong>优先筛选链接到多个竞争对手（2+）的域名。链接越多对手，外展成功率越高。</div>
+    <div class="note gap"><strong>数量选择</strong>3-5 个规模相近的竞争对手。过少漏模式，过多增加噪音。</div>
+    <div class="note warn"><strong>注意</strong>差距列表是起点，非待办清单。需过滤垃圾、付费链接与不相关来源。</div>
+  </div>
+
+  <div class="card">
+    <h2>五阶段分析流程</h2>
+    <div class="grid-2">
+      <div class="note method"><strong>1. 拉取</strong>导出竞争对手完整引用域名。工具：Ahrefs Site Explorer、Semrush Backlink Gap。</div>
+      <div class="note method"><strong>2. 过滤</strong>按主题相关性优先，权威分数次之。移除垃圾目录、低质量站、付费交换。</div>
+      <div class="note method"><strong>3. 分类</strong>数字 PR、资源页、客座文章、断链机会、合作伙伴、列表页。</div>
+      <div class="note method"><strong>4. 差距映射</strong>识别链接到 2+ 对手但未链你的域名。这是最高优先级目标。</div>
+      <div class="note method"><strong>5. 执行</strong>按相关性与重叠度排序后人工外展。季度复盘新模式。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>优先级评分（模拟）</h2>
+    <table>
+      <tr><th>标准</th><th>高优先级</th><th>低优先级</th></tr>
+      <tr><td>竞争对手重叠</td><td>链接到 3+ 对手</td><td>仅链接 1 个</td></tr>
+      <tr><td>主题相关性</td><td>直接覆盖细分领域</td><td>泛泛提及</td></tr>
+      <tr><td>编辑性位置</td><td>正文或资源页</td><td>页脚 / 侧边栏</td></tr>
+      <tr><td>真实流量</td><td>有稳定有机流量</td><td>无流量或突然下跌</td></tr>
+      <tr><td>权威分数</td><td>相对竞争水平</td><td>仅作辅助筛选</td></tr>
+    </table>
+    <p class="muted">相关性与重叠度优先于纯权威分数。链接到多个对手的相关站点是最高收益目标。</p>
+  </div>
+
+  <div class="card">
+    <h2>常见链接类型与应对</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>原创数据 / 研究</strong> — 竞品靠数据获链，优先补齐同类内容。</li>
+      <li><strong>资源页 / 列表</strong> — 检查是否可加入现有列表，或创建更好资源。</li>
+      <li><strong>数字 PR / 媒体</strong> — 分析报道角度，寻找类似新闻钩子。</li>
+      <li><strong>断链</strong> — 竞品有死链，可提供替代内容。</li>
+      <li><strong>付费 / 交换</strong> — 跳过。Google 政策禁止，价值通常被抵消。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>可扩展 backlink_research 工具输出差距分析结果。</li>
+      <li>质量评分模型可应用于差距列表筛选。</li>
+      <li>记忆提取可沉淀「竞品高价值链接来源类型」。</li>
+      <li>任何外展仍需 HITL 人工确认。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">竞争对手外链结构分析的核心是差距映射：找到已证明愿意链接你领域的站点，按相关性与重叠度优先外展，而非盲目复制数量。</p>
+  </div>
+</div>
+{% endblock %}

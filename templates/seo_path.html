@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}SEO 学习路径 ReAct 分析{% endblock %}
+{% block heading %}🎯 SEO 学习路径 · ReAct 分析{% endblock %}
+{% block related %}<a href="/seo">SEO 可视化</a><a href="/ai-react">通用 ReAct</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.progress-bar { height: 8px; background: var(--border); border-radius: 4px; margin: 6px 0; }
+.progress-fill { height: 100%; background: #0ea5e9; border-radius: 4px; }
+.stage { margin: 12px 0; padding: 12px; background: var(--surface); border-radius: 8px; }
+.trajectory { margin-top: 16px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>专用 ReAct Agent 分析</h2>
+    <p>使用 Thought → Action → Observation 循环，专门分析 SEO 学习路径的阶段进度与下一步建议。</p>
+    <button onclick="runAnalysis()">运行 SEO 路径分析</button>
+    <div id="result" style="margin-top:20px;" aria-live="polite"></div>
+    <div id="trajectory" class="trajectory"></div>
+  </div>
+</div>
+<script>
+async function runAnalysis(btn) {
+  const esc = SEO.escapeHtml, result = document.getElementById("result");
+  SEO.loading(result, "正在分析学习路径…");
+  document.getElementById("trajectory").innerHTML = "";
+  let data;
+  try { data = await SEO.withButton(btn, () => SEO.postJSON("/api/ai/seo-path", {}), "分析中…"); }
+  catch (e) { SEO.failed(result, e, () => runAnalysis(btn)); return; }
+
+  const answer = data.result || {};
+  let html = `<h3>分析报告</h3><p><strong>总结：</strong>${esc(answer.summary || "")}</p>`;
+  if (answer.stage_progress) {
+    html += `<h4>各阶段进度</h4>`;
+    for (const [stage, prog] of Object.entries(answer.stage_progress)) {
+      const pct = Math.max(0, Math.min(100, Number(prog) || 0));
+      html += `<div class="stage"><div>${esc(stage)}：${pct}%</div>
+        <div class="progress-bar" role="progressbar" aria-label="${esc(stage)}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
+    }
+  }
+  if (answer.weak_stages) html += `<p><strong>薄弱阶段：</strong>${esc(answer.weak_stages.join("、") || "无")}</p>`;
+  if (answer.next_actions) html += `<h4>下一步建议</h4><ul>${answer.next_actions.map(s => `<li>${esc(s)}</li>`).join("")}</ul>`;
+  html += `<p><em>${esc(answer.recommendation || "")}</em></p>`;
+  result.innerHTML = html; SEO.done(result);
+  document.getElementById("trajectory").innerHTML = SEO.renderTrajectory(data.trajectory);
+}
+</script>
+{% endblock %}

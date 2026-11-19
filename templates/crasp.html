@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}CRASP 框架 · 深度解析{% endblock %}
+{% block heading %}CRASP 框架{% endblock %}
+{% block related %}<a href="/crasp-vs-cited">vs CITED</a><a href="/passage">段落架构</a><a href="/citation">引用追踪</a><a href="/seo-workflow">工作流</a>{% endblock %}
+{% block head %}
+<style>
+.letter { font-size: 36px; font-weight: 700; color: var(--accent); width: 48px; }
+.pillar { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.pillar:last-child { border-bottom: none; }
+.example { background: var(--surface); border-radius: 6px; padding: 10px; font-size: 13px; margin-top: 6px; }
+.good { border-left: 3px solid #10b981; }
+.bad { border-left: 3px solid #ef4444; }
+.score { display: inline-block; background: var(--accent); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>定义</h2>
+    <p>CRASP 是面向 AI 引用的内容质量框架，用于判断一段内容是否容易被生成式引擎提取并引用。</p>
+    <p class="muted">来源：AEO/GEO 优化实践（与 CITED、FSA 等框架互补）。目标是让内容同时满足「可引用 + 可信 + 可提取」。</p>
+  </div>
+
+  <div class="card">
+    <div class="pillar">
+      <div class="letter">C</div>
+      <div>
+        <strong>Clarity · 清晰性</strong>
+        <p class="muted">无歧义的陈述，AI 可直接引用而不需上下文补全。</p>
+        <div class="example good">✅ 「根据 2026 年数据，采用原创统计的页面获得 AI 引用的概率提升 30–40%。」</div>
+        <div class="example bad">❌ 「很多人觉得内容质量很重要，可能有帮助。」</div>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="letter">R</div>
+      <div>
+        <strong>Relevance · 相关性</strong>
+        <p class="muted">匹配用户真实的对话式查询意图，而非纯关键词堆砌。</p>
+        <div class="example good">✅ 标题与首段直接回答「如何让 AI 引用我的页面」。</div>
+        <div class="example bad">❌ 标题是问题，正文却在讲历史背景。</div>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="letter">A</div>
+      <div>
+        <strong>Authority · 权威性</strong>
+        <p class="muted">来源、专家资质、第三方确认。自有页面约占引用的 14%，第三方来源占 80%+。</p>
+        <div class="example good">✅ 明确作者、引用研究、链接到原始数据或第三方报道。</div>
+        <div class="example bad">❌ 匿名声明，无任何来源或作者信息。</div>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="letter">S</div>
+      <div>
+        <strong>Structure · 结构</strong>
+        <p class="muted">可扫描、可提取的格式：问题式标题、列表、表格、自包含段落。</p>
+        <div class="example good">✅ 问题式 H2 + 40–60 字直接答案 + 表格呈现比较。</div>
+        <div class="example bad">❌ 长段落叙述，答案埋在中间，无标题分层。</div>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="letter">P</div>
+      <div>
+        <strong>Precision · 精确性</strong>
+        <p class="muted">具体事实、数字、日期、实体。带源数字显著提升引用概率。</p>
+        <div class="example good">✅ 「2026 年 10 月研究显示，表格内容被引用的比例显著高于纯文字。」</div>
+        <div class="example bad">❌ 「最近有研究表明效果不错。」</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>与其他框架对照</h2>
+    <p><strong>CITED</strong>：Clear Answer First → Independent Evidence → Typed Structure → Entity Consistency → Decay Monitoring</p>
+    <p><strong>FSA</strong>：Freshness · Structure · Authority</p>
+    <p><strong>CRASP</strong> 更强调「可引用语句 + 精确数字」的微观质量，适合段落级审核。</p>
+  </div>
+
+  <div class="card">
+    <h2>快速自检清单</h2>
+    <p>□ 每段核心陈述是否可单独引用？（C）</p>
+    <p>□ 标题与内容是否匹配真实用户提问？（R）</p>
+    <p>□ 是否有来源、作者或第三方确认？（A）</p>
+    <p>□ 是否使用问题式标题 + 列表/表格？（S）</p>
+    <p>□ 是否包含具体数字、日期或实体？（P）</p>
+    <p style="margin-top:10px;"><span class="score">通过 4/5 即可优先优化</span></p>
+  </div>
+
+  <div class="card">
+    <h2>落地建议</h2>
+    <p>1. 在每个主要 H2 后立即放置 40–60 字可提取答案（同时满足 C + R + P）。</p>
+    <p>2. 每页至少加入一个带源原创数字或引用研究（A + P）。</p>
+    <p>3. 用表格承载比较与步骤（S），并确保 schema 与可见文本一致。</p>
+    <p>4. 将 CRASP 检查纳入工作流 Agent 的 <code>passage_audit</code> 步骤。</p>
+  </div>
+</div>
+{% endblock %}

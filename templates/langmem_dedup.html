@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}LangMem 去重与合并{% endblock %}
+{% block heading %}LangMem 去重与合并{% endblock %}
+{% block related %}<a href="/langmem-semantic">语义提取</a><a href="/langchain-memory">记忆模块</a><a href="/langgraph-state">状态管理</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.llm { border-left-color: #059669; }
+.control { border-left-color: #7c3aed; }
+.contrast { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心机制</h2>
+    <div class="note llm"><strong>LLM 驱动合并</strong>无固定几何阈值。每次调用接收对话 + 现有记忆，由 LLM 决定：创建新条目、更新旧条目（PatchDoc）、或删除过时条目（RemoveDoc）。</div>
+    <div class="note llm"><strong>指令控制行为</strong>instructions 参数决定合并策略。例如「新主题新建记忆」或「全部合并到一条」。开发者通过提示词引导，而非代码规则。</div>
+    <div class="note llm"><strong>ID 保持</strong>更新操作保留原 UUID。删除操作返回 RemoveDoc 标记目标 ID。调用方决定实际删除方式（硬删/软删）。</div>
+  </div>
+
+  <div class="card">
+    <h2>操作控制</h2>
+    <div class="grid-2">
+      <div class="note control"><strong>enable_inserts</strong>默认开启。关闭后仅允许更新现有记忆，不创建新条目。适合画像类场景。</div>
+      <div class="note control"><strong>enable_updates</strong>默认开启。允许 LLM 通过 PatchDoc 修改已有记忆内容。</div>
+      <div class="note control"><strong>enable_deletes</strong>默认关闭。开启后 LLM 可返回 RemoveDoc 标记删除。适合清理矛盾或过时事实。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>画像 vs 集合</h2>
+    <div class="note"><strong>画像（Profile）</strong>单文档结构。新信息覆盖旧字段。适合「最新状态」场景（偏好、联系方式）。</div>
+    <div class="note"><strong>集合（Collection）</strong>多文档增长。每条记忆独立 ID。适合积累事实（订单、事件）。需指令明确「何时新建 vs 合并」。</div>
+    <div class="note"><strong>风险</strong>指令不当可能导致过度合并（丢失细节）或重复条目（检索精度下降）。</div>
+  </div>
+
+  <div class="card">
+    <h2>与几何去重对比</h2>
+    <div class="note contrast"><strong>几何方法</strong>嵌入距离阈值（如 L2 ≤ 0.35）判定重复，合并时取最新内容与最高重要性。确定性高，但语义理解有限。</div>
+    <div class="note contrast"><strong>LangMem</strong>LLM 判断语义等价与矛盾。可处理改写、上下文变化、部分更新。依赖模型质量与指令设计。</div>
+    <div class="note contrast"><strong>权衡</strong>几何方法成本低、可预测；LLM 方法更灵活但每次调用消耗 token，结果可能波动。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>当前系统无记忆去重需求。若引入长期知识存储，需选择合并策略。</li>
+      <li>SEO 工作流可记录用户偏好（主题优先级）。画像模式适合「最新偏好」；集合模式适合历史决策日志。</li>
+      <li>若需确定性，可考虑几何去重作为补充；若需语义理解，可评估 LLM 合并。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">LangMem 去重不是算法，而是 LLM 在指令引导下的合并决策。开发者通过 instructions 与 enable_* 参数控制行为，而非固定阈值。</p>
+  </div>
+</div>
+{% endblock %}

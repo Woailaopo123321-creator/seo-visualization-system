@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}查询扇出策略分析{% endblock %}
+{% block heading %}查询扇出策略分析{% endblock %}
+{% block related %}<a href="/aio-optimize">AIO 优化</a><a href="/aeo-geo">AEO/GEO</a><a href="/topical">主题权威</a><a href="/seo-workflow">工作流</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.data { border-left-color: #7c3aed; }
+.strategy { border-left-color: #059669; }
+.caution { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>什么是查询扇出</h2>
+    <div class="note"><strong>机制</strong>AI 系统将一个用户问题拆成多个相关子查询，并行检索，再合并为单一答案。Google AI Mode 与 AI Overviews 均可使用此技术。</div>
+    <div class="note"><strong>效果</strong>页面可因回答某个子问题而被引用，即使不排名用户输入的主词。Deep Search 模式可运行数百次检索。</div>
+    <div class="note data"><strong>规模</strong>Gemini 3 平均每提示约 10.7 个子查询（较 Gemini 2.5 的 6.01 提升），其中约 95% 无搜索量。</div>
+  </div>
+
+  <div class="card">
+    <h2>关键数据</h2>
+    <div class="grid-2">
+      <div class="note data"><strong>+161% 引用概率</strong>同时排名主查询与至少一个扇出查询的页面，比仅排名主查询的页面被引用概率高 161%（Surfer 研究，Spearman 0.77）。</div>
+      <div class="note data"><strong>来源分布变化</strong>2026 年 3 月 Ahrefs 数据：仅 37.9% 的 AI Overview 引用同时排名主查询前 10，较 2025 年 7 月的 76% 大幅下降。</div>
+      <div class="note caution"><strong>覆盖非越多越好</strong>AirOps 研究：在控制主查询相关性后，覆盖 26-50% 子主题的页面引用率（38.2%）高于覆盖全部的页面（34.0%）。</div>
+      <div class="note data"><strong>检索排名仍关键</strong>底层检索排名第一的页面被引用概率约 58.4%。扇出覆盖是补充，而非替代。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>策略建议</h2>
+    <div class="note strategy"><strong>识别核心子问题</strong>从买家真实问题出发，列出定义、比较、成本、步骤、风险等维度。不需穷尽所有可能扇出。</div>
+    <div class="note strategy"><strong>答案前置 + 主题集群</strong>每个章节针对一个子问题给出直接答案；用支柱页 + 集群覆盖相关子主题，而非单页堆砌。</div>
+    <div class="note strategy"><strong>优先相关性</strong>先确保对主查询有强相关性，再选择性覆盖高价值子问题。部分覆盖优于盲目全覆盖。</div>
+    <div class="note"><strong>监控双指标</strong>同时追踪主词排名与 AI 引用。Search Console Generative AI 报告可辅助观察。</div>
+  </div>
+
+  <div class="card">
+    <h2>与本系统映射</h2>
+    <div class="note"><strong>主题权威页面</strong>/topical 的支柱-集群模型直接支持扇出覆盖。</div>
+    <div class="note"><strong>段落架构</strong>/passage 的 40-60 词答案块适合回答单个子问题。</div>
+    <div class="note"><strong>工作流集成</strong>SEO 工作流可在研究阶段加入子问题映射，在创建阶段强制答案前置。</div>
+  </div>
+
+  <div class="card">
+    <p class="muted">查询扇出让引用不再依赖主词排名。策略重点是识别高价值子问题、保持主查询相关性，并用集群而非单页覆盖。</p>
+  </div>
+</div>
+{% endblock %}

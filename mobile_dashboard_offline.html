@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统概览 · 学习可视化系统</title>
+<meta name="description" content="学习可视化系统 · 总览 · 系统概览仪表盘">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzRmNDZlNSIvPjxwYXRoIGQ9Ik04IDIyVjE0TTE0IDIyVjlNMjAgMjJ2LTZNMjYgMjJWMTIiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4K" type="image/svg+xml">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzRmNDZlNSIvPjxwYXRoIGQ9Ik04IDIyVjE0TTE0IDIyVjlNMjAgMjJ2LTZNMjYgMjJWMTIiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4K">
+<script>try { var t = localStorage.getItem("seo-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<style>
+/* ==========================================================
+   学习可视化系统 · 统一样式（基于仪表盘设计）
+   所有页面通过 templates/base.html 引入。
+   颜色一律用下面的变量：浅色 / 深色主题只需切换变量值。
+   ========================================================== */
+:root {
+  color-scheme: light;
+  --bg: #f8fafc;          /* 页面底色 */
+  --card: #ffffff;        /* 卡片 / 侧栏 */
+  --surface: #f8fafc;     /* 卡片内的浅底块 */
+  --surface-2: #f1f5f9;   /* 代码块 / 悬停 */
+  --text: #0f172a;
+  --muted: #526174;       /* 次要文字（浅色底上对比度 ≥ 4.5:1） */
+  --faint: #5f6f84;
+  --border: #e2e8f0;
+  --accent: #4f46e5;      /* 链接 / 强调文字 */
+  --accent-soft: #eef2ff;
+  --btn-bg: #4f46e5;      /* 按钮底色（白字对比度 ≥ 4.5:1） */
+  --ok: #047857;
+  --warn: #b45309;
+  --danger: #b91c1c;
+  --tint-indigo: #eef2ff; --ink-indigo: #3730a3; --line-indigo: #c7d2fe;
+  --tint-blue: #eff6ff;   --ink-blue: #075985;   --line-blue: #bfdbfe;
+  --tint-green: #ecfdf5;  --ink-green: #065f46;  --line-green: #a7f3d0;
+  --tint-amber: #fffbeb;  --ink-amber: #92400e;  --line-amber: #fde68a;
+  --tint-red: #fef2f2;    --ink-red: #991b1b;    --line-red: #fecaca;
+  --tint-purple: #faf5ff; --ink-purple: #86198f; --line-purple: #e9d5ff;
+  --topbar-bg: rgba(248, 250, 252, .92);
+  --shadow: 0 20px 50px rgba(15, 23, 42, .2);
+  --radius: 12px;
+  --sidebar-w: 224px;
+  --focus: #6366f1;
+  --tap: 36px;            /* 按钮最小高度；触屏设备上提高到 44px */
+}
+/* 深色主题：跟随系统（prefers-color-scheme），也可在左下角手动切换（data-theme） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b1120; --card: #111827; --surface: #0f172a; --surface-2: #1e293b;
+    --text: #e5e7eb; --muted: #a3b0c2; --faint: #94a3b8; --border: #2b3648;
+    --accent: #a5b4fc; --accent-soft: #1e1b4b; --btn-bg: #4f46e5;
+    --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+    --tint-indigo: #1e1b4b; --ink-indigo: #c7d2fe; --line-indigo: #3730a3;
+    --tint-blue: #0c1f3d;   --ink-blue: #93c5fd;   --line-blue: #1e3a8a;
+    --tint-green: #062a22;  --ink-green: #6ee7b7;  --line-green: #065f46;
+    --tint-amber: #2b1d06;  --ink-amber: #fcd34d;  --line-amber: #78350f;
+    --tint-red: #2c0f0f;    --ink-red: #fca5a5;    --line-red: #7f1d1d;
+    --tint-purple: #2a0d3a; --ink-purple: #f0abfc; --line-purple: #6b21a8;
+    --topbar-bg: rgba(11, 17, 32, .9);
+    --shadow: 0 20px 50px rgba(0, 0, 0, .5);
+    --focus: #a5b4fc;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1120; --card: #111827; --surface: #0f172a; --surface-2: #1e293b;
+  --text: #e5e7eb; --muted: #a3b0c2; --faint: #94a3b8; --border: #2b3648;
+  --accent: #a5b4fc; --accent-soft: #1e1b4b; --btn-bg: #4f46e5;
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --tint-indigo: #1e1b4b; --ink-indigo: #c7d2fe; --line-indigo: #3730a3;
+  --tint-blue: #0c1f3d;   --ink-blue: #93c5fd;   --line-blue: #1e3a8a;
+  --tint-green: #062a22;  --ink-green: #6ee7b7;  --line-green: #065f46;
+  --tint-amber: #2b1d06;  --ink-amber: #fcd34d;  --line-amber: #78350f;
+  --tint-red: #2c0f0f;    --ink-red: #fca5a5;    --line-red: #7f1d1d;
+  --tint-purple: #2a0d3a; --ink-purple: #f0abfc; --line-purple: #6b21a8;
+  --topbar-bg: rgba(11, 17, 32, .9);
+  --shadow: 0 20px 50px rgba(0, 0, 0, .5);
+  --focus: #a5b4fc;
+}
+@media (pointer: coarse), (max-width: 640px) { :root { --tap: 44px; } }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+a { color: var(--accent); text-underline-offset: 2px; }
+img, svg, video { max-width: 100%; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+th { color: var(--muted); font-weight: 600; background: var(--surface); }
+ul, ol { padding-left: 20px; }
+h1, h2, h3, h4 { line-height: 1.35; }
+h2 { font-size: 17px; margin-bottom: 8px; }
+h3 { font-size: 15px; }
+h4 { font-size: 14px; }
+p { margin-bottom: 6px; }
+::selection { background: #c7d2fe; color: #1e1b4b; }
+
+/* ---------- 无障碍：跳到正文、键盘焦点 ---------- */
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 3000; background: var(--btn-bg); color: #fff; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: top .15s; }
+.skip-link:focus { top: 12px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---------- 布局外壳 ---------- */
+.app-sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; transition: transform .2s ease; }
+.app-logo { padding: 16px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.app-logo-icon { width: 32px; height: 32px; background: var(--btn-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex: none; }
+.app-logo-text { font-weight: 600; font-size: 14px; color: var(--text); }
+.app-logo-sub { font-size: 11px; color: var(--faint); }
+.app-search { margin: 0 12px 8px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; width: calc(100% - 24px); min-height: 36px; }
+.app-nav { flex: 1; overflow-y: auto; padding-bottom: 12px; }
+.app-nav a { display: flex; align-items: center; gap: 8px; padding: 7px 16px; color: var(--muted); text-decoration: none; font-size: 13px; border-right: 3px solid transparent; }
+.app-nav a:hover { background: var(--surface-2); color: var(--accent); }
+.app-nav a.active { background: var(--accent-soft); color: var(--accent); border-right-color: var(--accent); font-weight: 600; }
+.app-nav a:focus-visible { outline-offset: -3px; }
+.app-nav .app-quick a { padding: 9px 16px; font-size: 14px; }
+.app-nav details { border-top: 1px solid var(--surface-2); }
+.app-nav summary { list-style: none; cursor: pointer; padding: 9px 16px 5px; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .04em; display: flex; justify-content: space-between; user-select: none; }
+.app-nav summary::-webkit-details-marker { display: none; }
+.app-nav summary::after { content: "▾"; transition: transform .15s; }
+.app-nav details:not([open]) summary::after { transform: rotate(-90deg); }
+.app-nav a .cnt { margin-left: auto; font-size: 11px; color: var(--faint); }
+.app-auth { border-top: 1px solid var(--border); padding: 8px 12px 8px 16px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.app-auth a { font-size: 12px; text-decoration: none; }
+.theme-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 4px 8px; min-height: 30px; font-size: 12px; border-radius: 8px; }
+.theme-btn:hover { color: var(--accent); border-color: var(--accent); opacity: 1; }
+.app-hidden { display: none !important; }
+
+.app-shell { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; min-width: 0; }
+.app-topbar { position: sticky; top: 0; z-index: 40; background: var(--topbar-bg); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+.app-menu-btn { display: none; background: var(--card); color: var(--text); border: 1px solid var(--border); width: 44px; height: 44px; padding: 0; font-size: 18px; border-radius: 8px; flex: none; }
+.app-titles { flex: 1; min-width: 0; }
+.app-titles h1 { font-size: 19px; font-weight: 600; line-height: 1.3; }
+.app-titles .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.app-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.app-related { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 24px 0; }
+.app-related a { font-size: 12px; color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+.app-related a:hover { background: var(--tint-indigo); text-decoration: underline; }
+.app-related .lbl { font-size: 12px; color: var(--muted); align-self: center; }
+.app-main { padding: 16px 24px 32px; flex: 1; min-width: 0; }
+.app-footer { padding: 14px 24px; font-size: 12px; color: var(--faint); border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.app-backdrop { display: none; }
+
+/* ---------- 通用组件 ---------- */
+.container { max-width: 1120px; margin: 0 auto; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; min-width: 0; }
+.card h2 { font-size: 15px; margin-bottom: 8px; }
+.card h3 { font-size: 14px; margin-bottom: 6px; }
+.card > h2:first-child, .card > h3:first-child { margin-top: 0; }
+
+/* 按钮：主按钮 / 次要（ghost）/ 成功 / 危险 / 小号；高度统一，触屏 ≥ 44px */
+button, .btn { background: var(--btn-bg); color: #fff; border: 1px solid transparent; padding: 7px 14px; min-height: var(--tap); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; line-height: 1.3; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: filter .15s, background-color .15s; }
+button:hover, .btn:hover { filter: brightness(1.08); }
+button:active, .btn:active { filter: brightness(.95); }
+button:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; filter: none; }
+.btn-ghost, .btn-secondary { background: var(--card); color: var(--accent); border-color: var(--border); }
+.btn-ghost:hover, .btn-secondary:hover { border-color: var(--accent); filter: none; }
+.btn-ok { background: #047857; color: #fff; }
+.btn-danger, .btn-no { background: var(--card); color: var(--danger); border-color: var(--line-red); }
+.btn-danger:hover, .btn-no:hover { background: var(--tint-red); filter: none; }
+.btn-sm { padding: 4px 10px; font-size: 13px; min-height: 30px; }
+@media (pointer: coarse), (max-width: 640px) { .btn-sm { min-height: 40px; } }
+button[aria-busy="true"]::before, .spinner { content: ""; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; display: inline-block; animation: spin .7s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+input, select, textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--card); color: var(--text); }
+input:not([type=checkbox]):not([type=radio]):not([type=range]), select { min-height: var(--tap); }
+input[type=checkbox], input[type=radio] { width: 18px; height: 18px; accent-color: var(--btn-bg); }
+input[type=range] { accent-color: var(--btn-bg); min-height: 28px; }
+@media (pointer: coarse), (max-width: 640px) { input[type=range] { min-height: 44px; } details > summary { min-height: 44px; } }
+input::placeholder, textarea::placeholder { color: var(--faint); }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+pre { background: var(--surface-2); padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+.muted { color: var(--muted); font-size: 13px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.link-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-decoration: none; color: inherit; }
+.link-card:hover { border-color: var(--accent); }
+.link-card strong { display: block; margin-bottom: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.error-box { background: var(--tint-red); color: var(--danger); border: 1px solid var(--line-red); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-top: 10px; }
+.step { margin: 8px 0; padding: 10px 12px; border-radius: 8px; font-size: 13px; word-break: break-word; }
+.step pre { margin-top: 6px; }
+.step.thought { background: var(--tint-blue); border-left: 4px solid #3b82f6; }
+.step.action { background: var(--tint-amber); border-left: 4px solid #f59e0b; }
+.step.observation { background: var(--tint-green); border-left: 4px solid #10b981; }
+.step.gate { background: var(--tint-purple); border-left: 4px solid #a855f7; }
+.table-wrap { overflow-x: auto; }
+
+/* 加载 / 空 / 出错三种状态（SEO.loading / SEO.empty / SEO.failed 生成） */
+.state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 28px 12px; color: var(--muted); font-size: 14px; }
+.state .icon { font-size: 28px; line-height: 1; }
+.state strong { color: var(--text); font-size: 15px; }
+.state.compact { padding: 12px; flex-direction: row; font-size: 13px; }
+.state.error { color: var(--danger); }
+.state.error strong { color: var(--danger); }
+.skeleton { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; margin: 8px 0; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* 提示消息（SEO.toast）：右上角堆叠，手机上在底部 */
+.toast-stack { position: fixed; top: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; max-width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+.toast-item { pointer-events: auto; display: flex; align-items: flex-start; gap: 10px; background: #0f172a; color: #f8fafc; padding: 10px 12px 10px 14px; border-radius: 10px; font-size: 13px; box-shadow: var(--shadow); border-left: 4px solid #6366f1; animation: toast-in .18s ease-out; }
+.toast-item.ok { border-left-color: #10b981; }
+.toast-item.error { border-left-color: #ef4444; }
+.toast-item.warn { border-left-color: #f59e0b; }
+.toast-item span { flex: 1; padding-top: 2px; }
+.toast-item button { background: transparent; color: #cbd5e1; min-height: 28px; padding: 0 6px; font-size: 16px; }
+.toast-item.out { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .2s; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 960px) {
+  .app-sidebar { transform: translateX(-100%); visibility: hidden; transition: transform .2s ease, visibility 0s .2s; }
+  body.nav-open .app-sidebar { transform: none; visibility: visible; box-shadow: var(--shadow); transition: transform .2s ease; }
+  body.nav-open .app-backdrop { display: block; position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 45; }
+  .app-shell { margin-left: 0; }
+  .app-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+  .app-topbar { padding: 10px 14px; }
+  .app-related { padding: 10px 14px 0; flex-wrap: nowrap; overflow-x: auto; }
+  .app-main { padding: 12px 14px 24px; }
+  .app-footer { padding: 12px 14px; }
+  .app-nav a, .app-nav .app-quick a { min-height: 44px; }
+  .app-nav summary { min-height: 40px; align-items: center; padding-top: 6px; }
+  .app-related a { min-height: 44px; display: inline-flex; align-items: center; }
+}
+@media (max-width: 640px) {
+  body { font-size: 14px; }
+  .app-titles h1 { font-size: 17px; }
+  .app-titles .sub { display: none; }
+  .app-topbar { flex-wrap: wrap; }
+  .app-actions { order: 3; width: 100%; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .card { padding: 14px; }
+  table { font-size: 12px; display: block; overflow-x: auto; }
+  .app-main { overflow-x: hidden; }
+  .container { padding: 0; }
+  .toast-stack { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- 打印：只保留正文，强制浅色 ---------- */
+@media print {
+  :root, :root[data-theme="dark"] { color-scheme: light; --bg: #fff; --card: #fff; --surface: #f8fafc; --surface-2: #f1f5f9; --text: #000; --muted: #333; --border: #ccc; --accent: #1e1b4b; }
+  .app-sidebar, .app-menu-btn, .app-related, .app-actions, .app-backdrop, .toast-stack, .skip-link, .no-print, button { display: none !important; }
+  .app-shell { margin: 0; }
+  .app-topbar { position: static; backdrop-filter: none; background: none; padding: 0 0 8px; }
+  .app-main { padding: 8px 0; }
+  .card { break-inside: avoid; border-color: #ccc; }
+  .app-footer { border: none; padding: 8px 0 0; }
+  .app-footer a { display: none; }
+  details > *:not(summary) { display: block !important; }
+  .pipeline, .kanban { flex-wrap: wrap; overflow: visible; }
+  textarea { border-color: #ccc; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 10px; color: #555; word-break: break-all; }
+}
+
+.badge-dot { margin-left: auto; background: #b45309; color: #fff; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; padding: 0 6px; }
+.pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.pill.ok { background: var(--tint-green); color: var(--ink-green); }
+.pill.warn { background: var(--tint-amber); color: var(--ink-amber); }
+.pill.bad { background: var(--tint-red); color: var(--ink-red); }
+.pill.info { background: var(--tint-indigo); color: var(--ink-indigo); }
+.pill.llm { background: var(--tint-purple); color: var(--ink-purple); }
+.callout { border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; border: 1px solid; }
+.callout.info { background: var(--tint-indigo); border-color: var(--line-indigo); color: var(--ink-indigo); }
+.callout.warn { background: var(--tint-amber); border-color: var(--line-amber); color: var(--ink-amber); }
+.callout.ok { background: var(--tint-green); border-color: var(--line-green); color: var(--ink-green); }
+.callout a { font-weight: 600; color: inherit; }
+
+/* 知识页通用条目：左侧色条 + 浅底（各页用 .core / .risk 等修饰类改色条颜色） */
+.note { border-left: 4px solid var(--accent); padding: 10px 14px; margin: 8px 0; background: var(--surface); border-radius: 0 8px 8px 0; }
+.note strong { color: var(--text); }
+/* 服务端给定的强调色：--tone 用于浅色主题，--tone-dark 用于深色主题（如心理学分数） */
+.tone { color: var(--tone, inherit); }
+:root[data-theme="dark"] .tone { color: var(--tone-dark, var(--tone)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tone { color: var(--tone-dark, var(--tone)); } }
+
+</style>
+<script>
+/* 全站公共脚本（window.SEO）
+ * - escapeHtml / display / request / postJSON：安全输出与 JSON 请求（统一中文错误信息）
+ * - toast / loading / empty / failed：提示消息与加载 / 空 / 出错三种状态
+ * - fmtTime：UTC 时间 → 本地时间（带时区标注，例如 “2026-11-19 09:29（UTC+8）”）
+ * - withButton：按钮忙碌状态（禁用 + 转圈 + aria-busy）
+ * - renderTrajectory：ReAct / 工作流轨迹
+ * - filterNav / toggleNav / cycleTheme：侧栏搜索、手机抽屉、浅色 / 深色主题
+ */
+(function () {
+  "use strict";
+
+  // ---------- 安全输出与请求 ----------
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  }
+  function display(value) {
+    if (value === null || value === undefined) return "";
+    return typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+  }
+  async function request(url, options) {
+    let res;
+    try {
+      res = await fetch(url, options);
+    } catch (e) {
+      throw new Error("网络错误：无法连接服务器，请检查服务是否在运行");
+    }
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* 非 JSON 响应 */ }
+    if (!res.ok) {
+      let msg = (data && (data.detail || data.error)) || ("请求失败（HTTP " + res.status + "）");
+      if (res.status === 401 && !(data && data.detail)) msg = "需要管理员登录才能修改数据（左下角「登录」）";
+      if (res.status === 403) msg = (data && data.detail) || "没有权限修改数据";
+      if (res.status === 429) msg = (data && data.detail) || "请求过于频繁，请稍后再试";
+      if (res.status >= 500 && !(data && data.detail)) msg = "服务器出错了，请稍后重试";
+      const err = new Error(msg);
+      err.status = res.status; err.data = data;
+      throw err;
+    }
+    return data;
+  }
+  function postJSON(url, body) {
+    return request(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})});
+  }
+
+  // ---------- 时间：数据库存 UTC，界面显示本地时间 ----------
+  function tzLabel(date) {
+    const off = -(date || new Date()).getTimezoneOffset();
+    const h = Math.trunc(Math.abs(off) / 60), m = Math.abs(off) % 60;
+    return "UTC" + (off >= 0 ? "+" : "-") + h + (m ? ":" + String(m).padStart(2, "0") : "");
+  }
+  function fmtTime(iso, opts) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d)) return String(iso);
+    const p = n => String(n).padStart(2, "0");
+    const text = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    return (opts && opts.bare) ? text : `${text}（${tzLabel(d)}）`;
+  }
+
+  // ---------- 提示消息 ----------
+  function toast(message, type, ms) {
+    const stack = document.getElementById("toast-stack");
+    if (!stack) return;
+    const item = document.createElement("div");
+    item.className = "toast-item " + (type || "info");
+    item.setAttribute("role", type === "error" ? "alert" : "status");
+    item.innerHTML = `<span>${escapeHtml(message)}</span><button type="button" aria-label="关闭提示">×</button>`;
+    const close = () => { item.classList.add("out"); setTimeout(() => item.remove(), 220); };
+    item.querySelector("button").addEventListener("click", close);
+    stack.appendChild(item);
+    while (stack.children.length > 4) stack.firstElementChild.remove();
+    setTimeout(close, ms || (type === "error" ? 6000 : 3200));
+  }
+
+  // ---------- 加载 / 空 / 出错 状态 ----------
+  function target(el) { return typeof el === "string" ? document.getElementById(el) : el; }
+  function loading(el, text, compact) {
+    const node = target(el); if (!node) return;
+    node.setAttribute("aria-busy", "true");
+    node.innerHTML = `<div class="state${compact ? " compact" : ""}" role="status"><span class="spinner" aria-hidden="true"></span><span>${escapeHtml(text || "加载中…")}</span></div>`;
+  }
+  function empty(el, title, hint, icon) {
+    const node = target(el); if (!node) return;
+    node.removeAttribute("aria-busy");
+    node.innerHTML = `<div class="state"><div class="icon" aria-hidden="true">${escapeHtml(icon || "🗂️")}</div><strong>${escapeHtml(title)}</strong>${hint ? `<span>${escapeHtml(hint)}</span>` : ""}</div>`;
+  }
+  function failed(el, err, retry) {
+    const node = target(el); if (!node) return;
+    node.removeAttribute("aria-busy");
+    const msg = err && err.message ? err.message : String(err || "出错了");
+    node.innerHTML = `<div class="state error" role="alert"><div class="icon" aria-hidden="true">⚠️</div><strong>加载失败</strong><span>${escapeHtml(msg)}</span>${retry ? '<button type="button" class="btn-secondary btn-sm">重试</button>' : ""}</div>`;
+    if (retry) node.querySelector("button").addEventListener("click", retry);
+  }
+  function done(el) { const node = target(el); if (node) node.removeAttribute("aria-busy"); }
+
+  // ---------- 按钮忙碌状态 ----------
+  async function withButton(btn, fn, busyText) {
+    let label;
+    if (btn) {
+      label = btn.innerHTML;
+      btn.disabled = true; btn.setAttribute("aria-busy", "true");
+      btn.textContent = busyText || "处理中…";
+    }
+    try { return await fn(); }
+    finally { if (btn) { btn.disabled = false; btn.removeAttribute("aria-busy"); btn.innerHTML = label; } }
+  }
+
+  // ---------- 轨迹 ----------
+  const STEP_LABEL = {thought: "思考", action: "行动", observation: "观察", gate: "人工闸门"};
+  function renderTrajectory(trajectory, title) {
+    let html = `<h3>${escapeHtml(title || "ReAct 轨迹")}</h3>`;
+    if (!(trajectory || []).length) return html + '<p class="muted">暂无轨迹。</p>';
+    trajectory.forEach(item => {
+      let body;
+      if (item.type === "action") body = "🔧 " + escapeHtml(item.tool) + (item.input && Object.keys(item.input).length ? "<pre>" + escapeHtml(display(item.input)) + "</pre>" : "");
+      else if (item.type === "observation") body = "<pre>" + escapeHtml(display(item.content)) + "</pre>";
+      else body = escapeHtml(display(item.content));
+      const label = STEP_LABEL[item.type] ? `${STEP_LABEL[item.type]} · ${String(item.type).toUpperCase()}` : String(item.type).toUpperCase();
+      html += `<div class="step ${escapeHtml(item.type)}"><strong>${escapeHtml(label)}（第 ${escapeHtml(item.step)} 步）</strong><br>${body}</div>`;
+    });
+    return html;
+  }
+
+  // ---------- 侧栏导航 ----------
+  function filterNav(q) {
+    q = (q || "").trim().toLowerCase();
+    document.querySelectorAll(".app-nav details").forEach(g => {
+      let visible = 0;
+      g.querySelectorAll("a").forEach(a => {
+        const hit = !q || a.textContent.toLowerCase().includes(q) || a.getAttribute("href").includes(q);
+        a.classList.toggle("app-hidden", !hit);
+        if (hit) visible++;
+      });
+      g.classList.toggle("app-hidden", visible === 0);
+      if (q && visible) g.open = true;
+    });
+  }
+  function toggleNav(force) {
+    const open = typeof force === "boolean" ? force : !document.body.classList.contains("nav-open");
+    document.body.classList.toggle("nav-open", open);
+    const btn = document.getElementById("app-menu-btn");
+    if (btn) { btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-label", open ? "关闭导航" : "打开导航"); }
+    if (open) { const s = document.querySelector(".app-search"); if (s) setTimeout(() => s.focus(), 50); }
+    else if (btn && document.activeElement && document.getElementById("app-sidebar").contains(document.activeElement)) btn.focus();
+  }
+
+  // ---------- 主题：自动（跟随系统）→ 浅色 → 深色 ----------
+  const THEMES = ["auto", "light", "dark"];
+  const THEME_LABEL = {auto: "◐ 自动", light: "☀ 浅色", dark: "☾ 深色"};
+  function currentTheme() { return document.documentElement.dataset.theme || "auto"; }
+  function applyTheme(t) {
+    if (t === "auto") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = t;
+    try { t === "auto" ? localStorage.removeItem("seo-theme") : localStorage.setItem("seo-theme", t); } catch (e) { /* 隐私模式 */ }
+    const btn = document.getElementById("theme-btn");
+    if (btn) { btn.textContent = THEME_LABEL[t]; btn.title = "外观：" + THEME_LABEL[t].slice(2) + "（点击切换）"; }
+  }
+  function cycleTheme() { applyTheme(THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length]); }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && document.body.classList.contains("nav-open")) toggleNav(false);
+    // “/” 快速聚焦侧栏搜索（输入框里不触发）
+    if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+      const s = document.querySelector(".app-search");
+      if (s && s.offsetParent !== null) { e.preventDefault(); s.focus(); }
+    }
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    applyTheme(currentTheme());
+    document.querySelectorAll("[data-tz-note]").forEach(n => { n.textContent = "时间按本地时区显示（" + tzLabel() + "）"; });
+    document.querySelectorAll("time[data-utc]").forEach(n => { n.textContent = fmtTime(n.getAttribute("datetime")); });
+    // 手机抽屉里点了链接后自动收起
+    const side = document.getElementById("app-sidebar");
+    if (side) side.addEventListener("click", e => { if (e.target.closest(".app-nav a")) toggleNav(false); });
+  });
+
+  window.SEO = {escapeHtml, display, request, postJSON, renderTrajectory, withButton, toast, loading, empty, failed,
+                done, fmtTime, tzLabel, filterNav, toggleNav, cycleTheme};
+})();
+
+</script>
+
+<style>
+.date-picker{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--muted);white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);text-decoration:none;color:inherit;transition:border-color .15s}
+a.stat:hover{border-color:#4f46e5}
+.stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+.stat .label{font-size:13px;color:var(--muted)}
+.stat .num{font-size:28px;font-weight:700;margin:4px 0;color:var(--text)}
+.stat .num small{font-size:16px;font-weight:600;color:var(--muted)}
+.stat .delta{font-size:12px;color:var(--ok)}
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);min-width:0}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+.card-header h2{font-size:15px;font-weight:600}
+.card-header a{font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
+.kanban{display:flex;gap:10px}
+.col{background:var(--surface);border-radius:10px;flex:1;padding:10px;min-width:0;display:flex;flex-direction:column}
+.col-header{font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;color:#fff;margin-bottom:8px;display:flex;justify-content:space-between}
+.col .item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;margin-bottom:8px;word-break:break-word}
+.col .item .tag{font-size:11px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;gap:4px}
+.col .item .bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px}
+.col .item .bar i{display:block;height:100%;background:#4f46e5;border-radius:2px}
+.col .more{font-size:11px;color:var(--faint);text-align:center;margin-bottom:6px}
+.col .empty{font-size:11px;color:var(--faint);text-align:center;padding:10px 0}
+.add-btn{font-size:12px;color:var(--muted);text-align:center;padding:8px;cursor:pointer;border:none;border-top:1px dashed var(--border);margin-top:auto;background:none;width:100%}
+.add-btn:hover{color:var(--accent)}
+.flow{display:flex;flex-direction:column;gap:6px}
+.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px;display:grid;grid-template-columns:28px 64px 1fr;align-items:center;gap:6px;text-align:left}
+.flow-step.done{background:var(--tint-indigo);border-color:var(--line-indigo)}
+.flow-step.current{border:2px solid #4f46e5;background:var(--card)}
+.flow-step .icon{font-size:18px}
+.flow-step .num{font-size:12px;color:var(--muted);white-space:nowrap}
+.flow-step .name{font-size:13px;font-weight:600}
+.flow-step .desc{display:inline;font-size:12px;color:var(--faint);font-weight:400;margin-left:2px}
+.flow-arrow{display:none}
+.flow-step .now{font-size:11px;color:var(--accent);margin-left:6px;font-weight:500}
+.progress{margin-top:12px;height:4px;background:var(--border);border-radius:2px}
+.progress i{display:block;height:100%;background:#4f46e5;border-radius:2px}
+.progress-label{font-size:11px;color:var(--muted);margin-top:6px;text-align:right}
+.agents{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px 0}
+.agent-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;text-align:center;min-width:100px}
+.agent-box.center{background:#4f46e5;color:#fff;border:none}
+.agent-box .role{font-size:11px;opacity:0.85;margin-top:4px}
+.wf-live{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding:8px 12px;border-radius:8px;background:var(--tint-indigo);border:1px dashed var(--line-indigo);font-size:12px;color:var(--ink-indigo);text-decoration:none}
+.agent-meta{text-align:center;font-size:11px;color:var(--faint);margin-top:8px}
+.psych{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.psych-item{text-align:center;padding:10px;background:var(--surface);border-radius:8px}
+.psych-item .score{font-size:22px;font-weight:700}
+.psych-item .label{font-size:12px;color:var(--muted);margin-top:4px}
+.psych-item .status{font-size:11px;margin-top:4px}
+.tip{background:var(--tint-amber);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink-amber);margin-top:12px}
+@media (max-width:1180px){
+  .grid-2{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+  .stats,.psych{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat .num{font-size:22px}
+  .kanban{overflow-x:auto;padding-bottom:8px}
+  .col{min-width:150px;flex:none}
+}
+</style>
+
+<style>.add-btn{display:none}</style>
+</head>
+<body class="">
+<a class="skip-link" href="#main">跳到正文</a>
+<aside class="app-sidebar" id="app-sidebar" aria-label="全站导航">
+  <a class="app-logo" href="http://127.0.0.1:5000/dashboard" aria-label="学习可视化系统 仪表盘">
+    <div class="app-logo-icon" aria-hidden="true">📊</div>
+    <div><div class="app-logo-text">学习可视化系统</div><div class="app-logo-sub">SEO · Learning Visualization</div></div>
+  </a>
+  <input class="app-search" type="search" placeholder="搜索 54 个页面…" aria-label="搜索页面" oninput="SEO.filterNav(this.value)">
+  <nav class="app-nav" aria-label="页面导航">
+    <div class="app-quick">
+      
+      <a href="http://127.0.0.1:5000/dashboard" class="active" aria-current="page">🏠 仪表盘</a>
+      
+      <a href="http://127.0.0.1:5000/" class="">📋 学习看板</a>
+      
+      <a href="http://127.0.0.1:5000/workflow-runs" class="">✅ 工作流审批台<span class="badge-dot" title="2 个运行待审批"><span class="sr-only">待审批 </span>2</span></a>
+      
+      <a href="http://127.0.0.1:5000/ai" class="">🧪 AI 管理中心</a>
+      
+      <a href="http://127.0.0.1:5000/sitemap" class="">🗂️ 全部页面</a>
+      
+    </div>
+    
+    <details class="app-group" open>
+      <summary>总览 · 6</summary>
+      <a href="http://127.0.0.1:5000/" class="">学习进度看板</a><a href="http://127.0.0.1:5000/dashboard" class="active" aria-current="page">系统概览仪表盘</a><a href="http://127.0.0.1:5000/overview" class="">系统总览</a><a href="http://127.0.0.1:5000/mobile" class="">手机控制台</a><a href="http://127.0.0.1:5000/schemes" class="">可视化方案</a><a href="http://127.0.0.1:5000/sitemap" class="">全部页面</a>
+    </details>
+    
+    <details class="app-group" >
+      <summary>SEO 知识 · 19</summary>
+      <a href="http://127.0.0.1:5000/seo" class="">SEO 可视化</a><a href="http://127.0.0.1:5000/seo-2026" class="">谷歌 SEO 2026</a><a href="http://127.0.0.1:5000/seo-deep" class="">2026 SEO 深度洞察</a><a href="http://127.0.0.1:5000/seo-path" class="">SEO 学习路径（ReAct）</a><a href="http://127.0.0.1:5000/seo-minimal" class="">SEO × 极简心理学</a><a href="http://127.0.0.1:5000/seo-tools" class="">SEO 工具对比</a><a href="http://127.0.0.1:5000/keywords" class="">关键词</a><a href="http://127.0.0.1:5000/eeat" class="">E-E-A-T</a><a href="http://127.0.0.1:5000/eeat-audit" class="">E-E-A-T 深度审计</a><a href="http://127.0.0.1:5000/entity" class="">实体 SEO · sameAs</a><a href="http://127.0.0.1:5000/topical" class="">主题权威 · 支柱-集群</a><a href="http://127.0.0.1:5000/passage" class="">段落架构</a><a href="http://127.0.0.1:5000/aeo-geo" class="">SEO · AEO · GEO</a><a href="http://127.0.0.1:5000/aio-optimize" class="">AI Overviews 优化</a><a href="http://127.0.0.1:5000/fanout" class="">查询扇出</a><a href="http://127.0.0.1:5000/citation" class="">AI 引用追踪</a><a href="http://127.0.0.1:5000/decay" class="">引用衰减监控</a><a href="http://127.0.0.1:5000/crasp" class="">CRASP 框架</a><a href="http://127.0.0.1:5000/crasp-vs-cited" class="">CRASP vs CITED</a>
+    </details>
+    
+    <details class="app-group" >
+      <summary>外链分析 · 8</summary>
+      <a href="http://127.0.0.1:5000/backlink" class="">外链策略 2026</a><a href="http://127.0.0.1:5000/backlink-tools" class="">外链四工具</a><a href="http://127.0.0.1:5000/backlink-quality" class="">外链质量指标</a><a href="http://127.0.0.1:5000/backlink-score-model" class="">质量评分模型</a><a href="http://127.0.0.1:5000/backlink-competitor" class="">竞品外链结构</a><a href="http://127.0.0.1:5000/backlink-competitor-quality" class="">竞品外链质量</a><a href="http://127.0.0.1:5000/anchor-text" class="">锚文本分布</a><a href="http://127.0.0.1:5000/backlink-auto" class="">外链自动化边界</a>
+    </details>
+    
+    <details class="app-group" >
+      <summary>AI 与自动化 · 11</summary>
+      <a href="http://127.0.0.1:5000/workflow-runs" class="">工作流审批台（LangGraph）</a><a href="http://127.0.0.1:5000/agent-architecture" class="">本系统多 AI 架构与路线图</a><a href="http://127.0.0.1:5000/agent-patterns" class="">多智能体模式与框架对比</a><a href="http://127.0.0.1:5000/ai" class="">AI 管理中心</a><a href="http://127.0.0.1:5000/ai-react" class="">ReAct 轨迹</a><a href="http://127.0.0.1:5000/seo-workflow" class="">自动化 SEO 工作流</a><a href="http://127.0.0.1:5000/ai-workflow" class="">AI 自动化工作流</a><a href="http://127.0.0.1:5000/dl-seo" class="">深度学习引用评分</a><a href="http://127.0.0.1:5000/dl-automation" class="">深度学习自动化</a><a href="http://127.0.0.1:5000/multi-agent" class="">多智能体架构</a><a href="http://127.0.0.1:5000/agent-security" class="">智能体安全协议</a>
+    </details>
+    
+    <details class="app-group" >
+      <summary>架构与记忆 · 9</summary>
+      <a href="http://127.0.0.1:5000/langgraph" class="">LangGraph 框架</a><a href="http://127.0.0.1:5000/langgraph-state" class="">LangGraph 状态管理</a><a href="http://127.0.0.1:5000/langchain-memory" class="">LangChain 记忆</a><a href="http://127.0.0.1:5000/langmem-semantic" class="">LangMem 语义提取</a><a href="http://127.0.0.1:5000/langmem-dedup" class="">LangMem 去重合并</a><a href="http://127.0.0.1:5000/langmem-instructions" class="">LangMem 指令设计</a><a href="http://127.0.0.1:5000/microservices" class="">微服务架构</a><a href="http://127.0.0.1:5000/consistency" class="">分布式一致性</a><a href="http://127.0.0.1:5000/cache-strategy" class="">分布式缓存策略</a>
+    </details>
+    
+    <details class="app-group" >
+      <summary>心理学 · 1</summary>
+      <a href="http://127.0.0.1:5000/minimal-psych" class="">极简设计心理学</a>
+    </details>
+    
+  </nav>
+  <div class="app-auth">
+    <span title="未设置 SEO_ADMIN_TOKEN：仅允许本机修改数据">🖥️ 本机模式</span>
+    <button type="button" class="theme-btn" id="theme-btn" onclick="SEO.cycleTheme()" aria-label="切换外观">◐ 自动</button>
+  </div>
+</aside>
+<div class="app-backdrop" onclick="SEO.toggleNav(false)"></div>
+<div class="app-shell">
+  <header class="app-topbar">
+    <button class="app-menu-btn" id="app-menu-btn" type="button" aria-label="打开导航" aria-controls="app-sidebar" aria-expanded="false" onclick="SEO.toggleNav()">☰</button>
+    <div class="app-titles">
+      <h1>系统概览</h1>
+      <div class="sub">整合学习可视化、SEO 工作流、多智能体协作与心理学洞察</div>
+    </div>
+    <div class="app-actions"><div class="date-picker">📅 本周 2026-11-16 ~ 2026-11-22</div></div>
+  </header>
+  
+  <main class="app-main" id="main" tabindex="-1">
+<div class="callout warn" style="font-size:12px;text-align:center">📦 离线快照 · 生成于 2026-11-19 10:03 · 数据不会自动更新；运行 <code>python scripts/export_offline.py</code> 重新生成</div>
+    
+<a class="callout warn" style="display:block;text-decoration:none" href="http://127.0.0.1:5000/workflow-runs">⏸ 有 2 个 SEO 工作流停在人工闸门，等你审批 ›</a>
+<section class="stats">
+    <a class="stat" href="http://127.0.0.1:5000/">
+      <div class="stat-icon" style="background:var(--tint-blue)">📄</div>
+      <div class="label">学习任务总数</div>
+      <div class="num" id="stat-tasks">10</div>
+      <div class="delta">已完成 2 · 完成率 20.0%</div>
+    </a>
+    <a class="stat" href="http://127.0.0.1:5000/sitemap">
+      <div class="stat-icon" style="background:var(--tint-green)">📚</div>
+      <div class="label">知识页面</div>
+      <div class="num">54</div>
+      <div class="delta">6 个分类</div>
+    </a>
+    <a class="stat" href="http://127.0.0.1:5000/ai">
+      <div class="stat-icon" style="background:var(--tint-indigo)">🤖</div>
+      <div class="label">智能体任务完成</div>
+      <div class="num">4</div>
+      <div class="delta">已注册 7 个 Agent（累计）</div>
+    </a>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--tint-amber)">📈</div>
+      <div class="label">平均学习进度</div>
+      <div class="num">50<small>%</small></div>
+      <div class="delta" style="color:var(--warn)">● 专注度 68 分</div>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-header"><h2>📋 知识看板 (Kanban)</h2><a href="http://127.0.0.1:5000/">查看全部 ›</a></div>
+      <div class="kanban">
+        
+        <div class="col">
+          <div class="col-header" style="background:#2563eb">待规划 <span>3</span></div>
+          
+          <div class="item">市场调研与选题规划
+            <div class="tag"><span>优先级：高</span></div>
+            
+          </div>
+          
+          <div class="item">用户需求分析
+            <div class="tag"><span>优先级：中</span></div>
+            
+          </div>
+          
+          <div class="item">竞品内容分析
+            <div class="tag"><span>优先级：中</span></div>
+            
+          </div>
+          
+          
+          <button class="add-btn" type="button" data-status="todo">+ 添加任务</button>
+        </div>
+        
+        <div class="col">
+          <div class="col-header" style="background:#15803d">进行中 <span>3</span></div>
+          
+          <div class="item">SEO 关键词研究
+            <div class="tag"><span>70%</span><span>优先级：高</span></div>
+            <div class="bar"><i style="width:70%"></i></div>
+          </div>
+          
+          <div class="item">内容大纲设计
+            <div class="tag"><span>50%</span><span>优先级：中</span></div>
+            <div class="bar"><i style="width:50%"></i></div>
+          </div>
+          
+          <div class="item">初稿撰写
+            <div class="tag"><span>30%</span><span>优先级：中</span></div>
+            <div class="bar"><i style="width:30%"></i></div>
+          </div>
+          
+          
+          <button class="add-btn" type="button" data-status="in_progress">+ 添加任务</button>
+        </div>
+        
+        <div class="col">
+          <div class="col-header" style="background:#7e22ce">待优化 <span>2</span></div>
+          
+          <div class="item">E-E-A-T 信号补强
+            <div class="tag"><span>75%</span><span>优先级：高</span></div>
+            <div class="bar"><i style="width:75%"></i></div>
+          </div>
+          
+          <div class="item">内链结构优化
+            <div class="tag"><span>80%</span><span>优先级：中</span></div>
+            <div class="bar"><i style="width:80%"></i></div>
+          </div>
+          
+          
+          <button class="add-btn" type="button" data-status="review">+ 添加任务</button>
+        </div>
+        
+        <div class="col">
+          <div class="col-header" style="background:#475569">已完成 <span>2</span></div>
+          
+          <div class="item">标题与描述优化
+            <div class="tag"><span>优先级：中</span></div>
+            
+          </div>
+          
+          <div class="item">关键词布局优化
+            <div class="tag"><span>优先级：低</span></div>
+            
+          </div>
+          
+          
+          <button class="add-btn" type="button" data-status="done">+ 添加任务</button>
+        </div>
+        
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2>🔄 SEO 工作流阶段</h2><a href="http://127.0.0.1:5000/workflow-runs">审批台 ›</a></div>
+      <div class="flow">
+        
+        <div class="flow-step done"><div class="icon">🔍</div><div class="num">1. 研究</div><div class="name">关键词与用户<span class="desc">需求分析</span></div></div>
+        <span class="flow-arrow">→</span>
+        
+        <div class="flow-step done"><div class="icon">📋</div><div class="num">2. 规划</div><div class="name">内容规划<span class="desc">大纲设计</span></div></div>
+        <span class="flow-arrow">→</span>
+        
+        <div class="flow-step current"><div class="icon">✏️</div><div class="num">3. 创建</div><div class="name">内容撰写<span class="desc">素材整理</span><span class="now">● 进行中</span></div></div>
+        <span class="flow-arrow">→</span>
+        
+        <div class="flow-step"><div class="icon">📊</div><div class="num">4. 优化</div><div class="name">SEO 优化<span class="desc">质量提升</span></div></div>
+        <span class="flow-arrow">→</span>
+        
+        <div class="flow-step"><div class="icon">🚀</div><div class="num">5. 发布</div><div class="name">内容发布<span class="desc">效果跟踪</span></div></div>
+        
+        
+      </div>
+      <div class="progress"><i style="width:60%"></i></div>
+      <a class="wf-live" href="http://127.0.0.1:5000/workflow-runs"><span>⚙️ LangGraph 工作流</span><span>4 次运行 · <b>2</b> 待审批 · 1 完成</span></a>
+      <div class="progress-label">当前阶段 3/5 · 60%</div>
+    </section>
+  </div>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-header"><h2>🤖 多智能体协作 (Multi-Agent)</h2><a href="http://127.0.0.1:5000/agent-architecture">架构与路线图 ›</a></div>
+      
+      <div class="agents">
+        <div class="agent-box">🔍 研究智能体<div class="role">关键词研究与内容分析</div></div>
+        <div class="agent-box center">协调智能体<div class="role">任务分配与调度</div></div>
+        <div class="agent-box">📊 优化智能体<div class="role">SEO 优化与质量提升</div></div>
+      </div>
+      <div class="agents" style="margin-top:8px">
+        <div class="agent-box">✏️ 创作智能体<div class="role">内容撰写与素材整合</div></div><div class="agent-box">🚀 发布智能体<div class="role">内容发布与效果监控</div></div>
+      </div>
+      <div class="agent-meta">Supervisor 规则路由 + LangGraph 流水线 + 人工闸门 · 后端已注册 7 个 Agent，已完成 4 次任务</div>
+    </section>
+
+    <section class="card">
+      <div class="card-header"><h2>🧠 心理学洞察（最小化卡片）</h2><a href="http://127.0.0.1:5000/minimal-psych">查看全部 ›</a></div>
+      <div class="psych">
+        
+        <div class="psych-item"><div class="score tone" style="--tone:#15803d;--tone-dark:#4ade80">72分</div><div class="label">心流状态</div><div class="status tone" style="--tone:#15803d;--tone-dark:#4ade80">● 良好</div></div>
+        
+        <div class="psych-item"><div class="score tone" style="--tone:#b45309;--tone-dark:#fbbf24">46分</div><div class="label">认知负荷</div><div class="status tone" style="--tone:#b45309;--tone-dark:#fbbf24">● 中等</div></div>
+        
+        <div class="psych-item"><div class="score tone" style="--tone:#7e22ce;--tone-dark:#d8b4fe">68分</div><div class="label">内在动机</div><div class="status tone" style="--tone:#7e22ce;--tone-dark:#d8b4fe">● 较强</div></div>
+        
+        <div class="psych-item"><div class="score tone" style="--tone:#1d4ed8;--tone-dark:#93c5fd">65分</div><div class="label">注意力维持</div><div class="status tone" style="--tone:#1d4ed8;--tone-dark:#93c5fd">● 较强</div></div>
+        
+      </div>
+      <div class="tip">💡 小贴士：保持适中的认知负荷与内在动机，有助于进入心流状态，提升学习效率。</div>
+    </section>
+  </div>
+
+  </main>
+  <footer class="app-footer"><span>学习可视化系统 · 54 个页面</span><a href="http://127.0.0.1:5000/sitemap">全部页面</a><a href="http://127.0.0.1:5000/health">系统状态</a><span class="tz-note" data-tz-note>时间均按本地时区显示</span></footer>
+</div>
+<div class="toast-stack" id="toast-stack" role="status" aria-live="polite"></div>
+
+<script>
+document.querySelectorAll(".add-btn").forEach(btn => btn.addEventListener("click", async () => {
+  const title = prompt("新任务标题（最多 80 字）");
+  if (title === null) return;
+  await SEO.withButton(btn, async () => {
+    try {
+      await SEO.postJSON("/api/tasks", {title, status: btn.dataset.status});
+      SEO.toast("已添加任务，正在刷新…", "ok");
+      setTimeout(() => location.reload(), 600);
+    } catch (e) {
+      SEO.toast("添加失败：" + e.message, "error");
+    }
+  }, "添加中…");
+}));
+</script>
+
+</body>
+</html>

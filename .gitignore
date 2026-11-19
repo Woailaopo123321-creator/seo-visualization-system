@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+app.log
+screenshots/
+data/learning_data.json
+data/workflow.sqlite*

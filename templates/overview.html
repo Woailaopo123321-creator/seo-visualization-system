@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}系统总览 · 学习可视化{% endblock %}
+{% block heading %}系统总览{% endblock %}
+{% block related %}<a href="/">看板</a><a href="/seo-workflow">工作流</a><a href="/dl-seo">DL评分</a><a href="/multi-agent">协作</a><a href="/cache-strategy">缓存</a><a href="/consistency">一致性</a>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心入口</h2>
+    <div class="grid-3">
+      <a class="link-card" href="/"><strong>学习看板</strong><span class="muted">进度可视化与任务管理</span></a>
+      <a class="link-card" href="/seo-workflow"><strong>SEO 工作流</strong><span class="muted">8 阶段自动化管道 + ReAct</span></a>
+      <a class="link-card" href="/dl-seo"><strong>引用概率评分</strong><span class="muted">深度学习风格加权模型</span></a>
+      <a class="link-card" href="/ai"><strong>AI 管理中心</strong><span class="muted">多智能体调度</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>SEO 深度模块</h2>
+    <div class="grid-3">
+      <a class="link-card" href="/aeo-geo"><strong>AEO / GEO</strong><span class="muted">AI Overviews 三层模型</span></a>
+      <a class="link-card" href="/citation"><strong>引用追踪</strong><span class="muted">来源与幽灵引用</span></a>
+      <a class="link-card" href="/passage"><strong>段落架构</strong><span class="muted">40-60 词答案块</span></a>
+      <a class="link-card" href="/crasp"><strong>CRASP 框架</strong><span class="muted">Clarity / Relevance / Authority</span></a>
+      <a class="link-card" href="/decay"><strong>衰减监控</strong><span class="muted">半衰期与刷新节奏</span></a>
+      <a class="link-card" href="/eeat"><strong>E-E-A-T</strong><span class="muted">信任信号审计</span></a>
+      <a class="link-card" href="/dashboard"><strong>仪表盘</strong><span class="muted">统计 · 看板 · 协作总览</span></a>
+      <a class="link-card" href="/seo-2026"><strong>2026 SEO</strong><span class="muted">核心更新 · AI Overviews</span></a>
+      <a class="link-card" href="/aio-optimize"><strong>AIO 优化</strong><span class="muted">引用策略与实证</span></a>
+      <a class="link-card" href="/fanout"><strong>查询扇出</strong><span class="muted">子查询覆盖分析</span></a>
+      <a class="link-card" href="/backlink"><strong>外链策略</strong><span class="muted">2026 提及与链接</span></a>
+      <a class="link-card" href="/backlink-auto"><strong>外链自动化</strong><span class="muted">风险边界与验证</span></a>
+      <a class="link-card" href="/backlink-tools"><strong>外链三工具</strong><span class="muted">发布 / 抓取 / 验证</span></a>
+      <a class="link-card" href="/backlink-quality"><strong>质量评估</strong><span class="muted">相关性优先指标</span></a>
+      <a class="link-card" href="/backlink-competitor"><strong>竞品结构</strong><span class="muted">差距分析与优先级</span></a>
+      <a class="link-card" href="/backlink-competitor-quality"><strong>竞品质量</strong><span class="muted">分层与模式识别</span></a>
+      <a class="link-card" href="/backlink-score-model"><strong>评分模型</strong><span class="muted">六维加权解析</span></a>
+      <a class="link-card" href="/anchor-text"><strong>锚文本分布</strong><span class="muted">自然度与风险信号</span></a>
+      <a class="link-card" href="/seo-tools"><strong>工具对比</strong><span class="muted">主流 SEO 程序功能</span></a>
+      <a class="link-card" href="/ai-workflow"><strong>AI 工作流</strong><span class="muted">编排模式与 HITL</span></a>
+      <a class="link-card" href="/langgraph"><strong>LangGraph</strong><span class="muted">图编排与持久化</span></a>
+      <a class="link-card" href="/langgraph-state"><strong>状态管理</strong><span class="muted">检查点与 Reducer</span></a>
+      <a class="link-card" href="/langchain-memory"><strong>记忆模块</strong><span class="muted">短期 / 长期</span></a>
+      <a class="link-card" href="/langmem-semantic"><strong>语义提取</strong><span class="muted">LangMem 机制</span></a>
+      <a class="link-card" href="/langmem-dedup"><strong>去重合并</strong><span class="muted">LLM 驱动</span></a>
+      <a class="link-card" href="/langmem-instructions"><strong>指令设计</strong><span class="muted">提取控制点</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>架构与系统</h2>
+    <div class="grid-3">
+      <a class="link-card" href="/multi-agent"><strong>多智能体协作</strong><span class="muted">编排模式与风险缓解</span></a>
+      <a class="link-card" href="/cache-strategy"><strong>分布式缓存</strong><span class="muted">四层模型与失效策略</span></a>
+      <a class="link-card" href="/consistency"><strong>一致性协议</strong><span class="muted">CAP / Raft / 模型谱系</span></a>
+      <a class="link-card" href="/agent-security"><strong>安全协议</strong><span class="muted">HITL · Kill Switch</span></a>
+      <a class="link-card" href="/dl-automation"><strong>DL 自动化</strong><span class="muted">信用分配 · 元认知</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>快速健康检查</h2>
+    <p class="muted">当前系统包含 7 个已注册 Agent，进程内 TTL 缓存（30s），请求计时中间件。SEO 工作流已集成外链研究、质量评分与验证工具。访问 <a href="/health">/health</a> 查看实时状态。</p>
+  </div>
+</div>
+{% endblock %}

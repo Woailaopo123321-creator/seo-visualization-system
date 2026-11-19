@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ page_title }}{% endblock %} · {{ app_name }}</title>
+<meta name="description" content="{% block description %}{{ page_desc }}{% endblock %}">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/static/favicon.svg?v={{ asset_version }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/favicon.svg?v={{ asset_version }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<script>try { var t = localStorage.getItem("seo-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="stylesheet" href="/static/app.css?v={{ asset_version }}">
+<script src="/static/common.js?v={{ asset_version }}"></script>
+{% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">跳到正文</a>
+<aside class="app-sidebar" id="app-sidebar" aria-label="全站导航">
+  <a class="app-logo" href="/dashboard" aria-label="{{ app_name }} 仪表盘">
+    <div class="app-logo-icon" aria-hidden="true">📊</div>
+    <div><div class="app-logo-text">{{ app_name }}</div><div class="app-logo-sub">SEO · Learning Visualization</div></div>
+  </a>
+  <input class="app-search" type="search" placeholder="搜索 {{ page_count }} 个页面…" aria-label="搜索页面" oninput="SEO.filterNav(this.value)">
+  <nav class="app-nav" aria-label="页面导航">
+    <div class="app-quick">
+      {% for href, label in [("/dashboard", "🏠 仪表盘"), ("/", "📋 学习看板"), ("/workflow-runs", "✅ 工作流审批台"), ("/ai", "🧪 AI 管理中心"), ("/sitemap", "🗂️ 全部页面")] %}
+      <a href="{{ href }}" class="{{ 'active' if current_path == href }}"{% if current_path == href %} aria-current="page"{% endif %}>{{ label }}{% if href == '/workflow-runs' and wf_waiting %}<span class="badge-dot" title="{{ wf_waiting }} 个运行待审批"><span class="sr-only">待审批 </span>{{ wf_waiting }}</span>{% endif %}</a>
+      {% endfor %}
+    </div>
+    {% for group, items in nav_groups.items() %}
+    <details class="app-group" {% if group == current_group or group == '总览' %}open{% endif %}>
+      <summary>{{ group }} · {{ items|length }}</summary>
+      {% for p in items %}<a href="{{ p.path }}" class="{{ 'active' if p.path == current_path }}"{% if p.path == current_path %} aria-current="page"{% endif %}>{{ p.title }}</a>{% endfor %}
+    </details>
+    {% endfor %}
+  </nav>
+  <div class="app-auth">
+    {% if auth.logged_in %}<span>🔑 管理员已登录</span><a href="/logout">退出</a>
+    {% elif auth.token_required %}<span>🔒 只读模式</span><a href="/login?next={{ current_path|urlencode }}">登录</a>
+    {% else %}<span title="未设置 SEO_ADMIN_TOKEN：仅允许本机修改数据">🖥️ 本机模式</span>{% endif %}
+    <button type="button" class="theme-btn" id="theme-btn" onclick="SEO.cycleTheme()" aria-label="切换外观">◐ 自动</button>
+  </div>
+</aside>
+<div class="app-backdrop" onclick="SEO.toggleNav(false)"></div>
+<div class="app-shell">
+  <header class="app-topbar">
+    <button class="app-menu-btn" id="app-menu-btn" type="button" aria-label="打开导航" aria-controls="app-sidebar" aria-expanded="false" onclick="SEO.toggleNav()">☰</button>
+    <div class="app-titles">
+      <h1>{% block heading %}{{ page_title }}{% endblock %}</h1>
+      {% if self.subheading()|trim %}<div class="sub">{% block subheading %}{% endblock %}</div>{% elif current_group %}<div class="sub">{{ current_group }}</div>{% endif %}
+    </div>
+    <div class="app-actions">{% block actions %}{% endblock %}</div>
+  </header>
+  {% if self.related()|trim %}<nav class="app-related" aria-label="相关页面"><span class="lbl">相关：</span>{% block related %}{% endblock %}</nav>{% endif %}
+  <main class="app-main" id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="app-footer"><span>{{ app_name }} · {{ page_count }} 个页面</span><a href="/sitemap">全部页面</a><a href="/health">系统状态</a><span class="tz-note" data-tz-note>时间均按本地时区显示</span></footer>
+</div>
+<div class="toast-stack" id="toast-stack" role="status" aria-live="polite"></div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

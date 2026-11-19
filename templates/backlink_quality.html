@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}外链质量评估指标{% endblock %}
+{% block heading %}外链质量评估指标{% endblock %}
+{% block related %}<a href="/backlink">外链策略</a><a href="/backlink-tools">三工具</a><a href="/backlink-auto">风险边界</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.metric { border-left-color: #059669; }
+.qual { border-left-color: #7c3aed; }
+.warn { border-left-color: #d97706; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+th { background: var(--surface-2); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>第三方权威分数（辅助参考）</h2>
+    <div class="note metric"><strong>Ahrefs Domain Rating (DR)</strong>0-100 对数刻度，衡量外链画像强度。DR4 将于 2026 年 12 月推出，与排名相关性更强，子域名独立评分。</div>
+    <div class="note metric"><strong>Moz Domain Authority (DA)</strong>机器学习模型预测排名能力。Moz 明确表示不是 Google 排名因素。</div>
+    <div class="note metric"><strong>Majestic Trust Flow (TF)</strong>与种子信任站点的接近程度（质量）。Citation Flow (CF) 衡量数量。TF 远低于 CF 提示大量弱链接。</div>
+    <div class="note metric"><strong>Semrush Authority Score</strong>综合链接强度、有机流量与垃圾因素。</div>
+    <div class="note warn"><strong>使用原则</strong>仅作相对比较与筛选。Google 不使用这些分数。可被操纵，需结合定性因素。</div>
+  </div>
+
+  <div class="card">
+    <h2>核心定性指标（优先评估）</h2>
+    <div class="grid-2">
+      <div class="note qual"><strong>主题相关性</strong>来源站与页面主题是否匹配。2026 年 Zyppy 调研中，57.1% SEO 将其列为最重要排名因素。</div>
+      <div class="note qual"><strong>编辑性位置</strong>正文内链接价值远高于页脚、侧边栏或全站模板。上下文相关的段落链接质量最高。</div>
+      <div class="note qual"><strong>锚文本自然度</strong>品牌词、通用词、部分匹配为主。精确匹配关键词比例过高（>10-15%）有风险。</div>
+      <div class="note qual"><strong>真实流量</strong>来源站有稳定有机流量与真实读者。高分但无流量的站点价值有限。</div>
+      <div class="note qual"><strong>链接属性</strong>dofollow 传递信号；nofollow / sponsored / ugc 为提示。付费链接必须标记 sponsored。</div>
+      <div class="note qual"><strong>链接邻里</strong>周围链接质量。垃圾邻里会拖累价值。出站链接过多且无关则降质。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>指标对比</h2>
+    <table>
+      <tr><th>指标</th><th>衡量内容</th><th>局限</th></tr>
+      <tr><td>DR / DA</td><td>外链画像相对强度</td><td>不反映相关性，可被操纵</td></tr>
+      <tr><td>Trust Flow</td><td>与信任种子的接近度</td><td>依赖 Majestic 种子集</td></tr>
+      <tr><td>主题相关性</td><td>语义与主题匹配</td><td>需人工判断</td></tr>
+      <tr><td>真实流量</td><td>实际读者规模</td><td>估算工具有误差</td></tr>
+      <tr><td>品牌提及</td><td>第三方讨论频率</td><td>与 AI 引用相关性更高（0.664）</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>评估优先级</h2>
+    <ol style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>相关性</strong> — 不相关直接降级</li>
+      <li><strong>编辑性与位置</strong> — 正文 > 资源页 > 页脚</li>
+      <li><strong>真实受众</strong> — 有流量与读者</li>
+      <li><strong>权威分数</strong> — 仅作相对比较</li>
+      <li><strong>锚文本与属性</strong> — 自然分布，正确标记</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>质量评分模型（模拟）</h2>
+    <p class="muted">加权模型：相关性 30% · 编辑性 20% · 真实流量 15% · 锚文本 15% · 权威分数 10% · 邻里 10%</p>
+    <div id="score-result" style="margin:10px 0; font-size:14px;">
+      <div class="note qual"><strong>示例评分</strong>0.78（高于阈值 0.70）</div>
+      <div class="note"><strong>优先级</strong>相关性 > 编辑性 > 真实流量 > 权威分数</div>
+    </div>
+    <button onclick="runScore()">重新模拟评分</button>
+  </div>
+  <div class="card">
+    <h2>与本系统关系</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li>外链研究工具可输出相关性评分与权威分数参考。</li>
+      <li>验证工具可监控锚文本变化与链接状态。</li>
+      <li>记忆提取可沉淀「高质量来源特征」（相关性优先）。</li>
+      <li>任何外展决策仍需 HITL 人工确认。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <p class="muted">外链质量评估以相关性与编辑性为核心，第三方权威分数仅作辅助。质量优于数量，品牌提及对 AI 可见性影响更大。</p>
+  </div>
+</div>
+<script>
+function runScore() {
+  const scores = [0.65, 0.72, 0.78, 0.81, 0.69];
+  const s = scores[Math.floor(Math.random()*scores.length)];
+  const status = s >= 0.70 ? '高于阈值，可优先外展' : '低于阈值，需提升相关性或编辑性';
+  document.getElementById('score-result').innerHTML = 
+    '<div class="note qual"><strong>模拟评分</strong>' + s.toFixed(2) + ' · ' + status + '</div>' +
+    '<div class="note"><strong>建议</strong>优先追求主题相关的正文链接；权威分数仅作筛选</div>';
+}
+</script>
+{% endblock %}

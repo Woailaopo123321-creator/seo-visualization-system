@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}LangGraph 框架{% endblock %}
+{% block heading %}LangGraph 框架{% endblock %}
+{% block related %}<a href="/ai-workflow">AI 工作流</a><a href="/multi-agent">协作模式</a><a href="/agent-security">安全协议</a><a href="/overview">总览</a>{% endblock %}
+{% block head %}
+<style>
+.core { border-left-color: #059669; }
+.compare { border-left-color: #7c3aed; }
+.fit { border-left-color: #d97706; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout info">✅ 本系统已用 LangGraph 落地：17 节点 SEO 流水线 + SqliteSaver 检查点 + interrupt 人工闸门 → <a href="/workflow-runs">工作流审批台</a> · <a href="/agent-architecture">架构说明</a></div>
+  <div class="card">
+    <h2>核心定位</h2>
+    <div class="note core"><strong>低层编排框架</strong>由 LangChain 团队维护（MIT 许可）。将智能体建模为节点与边的有向图，共享状态在图中传递。适合长期运行、有状态的工作流。</div>
+    <div class="note core"><strong>持久执行</strong>检查点机制保存每步状态。失败后可从中断处恢复；支持时间旅行调试与人工中断（interrupt）。</div>
+    <div class="note core"><strong>当前版本</strong>2026 年 11 月约 1.2.x。支持 Python 与 JavaScript/TypeScript。LangSmith 提供追踪与评估（付费层）。</div>
+  </div>
+
+  <div class="card">
+    <h2>核心概念</h2>
+    <div class="grid-2">
+      <div class="note"><strong>节点（Node）</strong>执行步骤：函数、LLM 调用或完整智能体。每个节点接收当前状态并返回更新。</div>
+      <div class="note"><strong>边（Edge）</strong>定义控制流。条件边根据状态决定下一节点。支持循环与分支。</div>
+      <div class="note"><strong>状态（State）</strong>类型化共享对象。检查点器在每步后持久化，支持恢复与回放。</div>
+      <div class="note"><strong>中断（Interrupt）</strong>任意节点可暂停等待人工审批，再继续执行。适合 HITL 闸门。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>框架对比（2026）</h2>
+    <div class="note compare"><strong>LangGraph</strong>显式图 + 检查点。最高控制与持久性。适合生产级、可审计、需人工审批的流程。学习曲线较陡。</div>
+    <div class="note compare"><strong>CrewAI</strong>角色 + 任务 + 船员。快速原型。适合内容与研究管道。Flows 增加事件驱动控制。</div>
+    <div class="note compare"><strong>AutoGen</strong>多智能体对话。已进入维护模式。微软推荐使用 Microsoft Agent Framework（2026 年 4 月 GA）。</div>
+  </div>
+
+  <div class="card">
+    <h2>适用场景</h2>
+    <div class="note fit"><strong>推荐使用</strong>长期运行工作流、需分支与重试、人工审批闸门、故障恢复、审计追踪。</div>
+    <div class="note fit"><strong>可考虑替代</strong>简单线性流程可用 CrewAI 快速原型；纯对话协作可评估 Agent Framework。</div>
+    <div class="note"><strong>与本系统关系</strong>当前系统采用轻量顺序管道 + ReAct。若需生产级持久性与图编排，可评估引入 LangGraph 作为外层编排。</div>
+  </div>
+
+  <div class="card">
+    <p class="muted">LangGraph 是 2026 年生产级智能体编排的参考架构。核心优势是检查点、HITL 中断与显式控制流。适合需要可靠性与可审计性的场景。</p>
+  </div>
+</div>
+{% endblock %}

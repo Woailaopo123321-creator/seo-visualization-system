@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}E-E-A-T{% endblock %}
+{% block heading %}E-E-A-T{% endblock %}
+{% block related %}<a href="/seo">SEO</a><a href="/eeat-audit">审计</a>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>Trust 为中心</h2>
+    <div class="grid" style="grid-template-columns: repeat(4,1fr); text-align:center;">
+      <div>Experience</div><div>Expertise</div><div>Authoritativeness</div><div><strong>Trust</strong></div>
+    </div>
+    <p class="muted" style="margin-top:8px;">2026：Trust 最重要；伪作者是低质量信号</p>
+  </div>
+  <div class="card">
+    <button onclick="location.href='/eeat-audit'">开始审计</button>
+  </div>
+</div>
+{% endblock %}

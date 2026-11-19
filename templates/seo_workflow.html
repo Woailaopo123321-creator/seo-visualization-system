@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}自动化 SEO 运作 · 2026 深度版{% endblock %}
+{% block heading %}自动化 SEO · 深度优化{% endblock %}
+{% block related %}<a href="/seo">SEO</a><a href="/seo-deep">深度洞察</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.stages { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.stage { flex: 1; min-width: 120px; background: var(--surface-2); border-radius: 8px; padding: 10px; text-align: center; font-size: 13px; }
+.stage.gate { border: 2px solid #f59e0b; }
+.stage.done { background: var(--tint-green); }
+.log { margin-top: 12px; background: var(--surface); padding: 10px; border-radius: 6px; font-size: 13px; max-height: 320px; overflow-y: auto; white-space: pre-wrap; }
+.insight { font-size: 13px; color: var(--muted); margin-top: 4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="callout warn">ℹ️ 这是<strong>旧版一次跑完模式</strong>：人工闸门只做标记、不会暂停。新版已迁到 LangGraph，会在关键词、简报、发布、外展四处真正暂停等你审批 → <a href="/workflow-runs">工作流审批台</a>（原理见 <a href="/agent-architecture">架构与路线图</a>）。</div>
+  <div class="card">
+    <h2>9 阶段深度工作流（2026）</h2>
+    <div class="stages" id="stages">
+      <div class="stage gate">1. Benchmark<br><small>AI 覆盖率</small></div>
+      <div class="stage gate">2. Keywords<br><small>人工确认</small></div>
+      <div class="stage">3. 主题集群</div>
+      <div class="stage">4. 实体信号</div>
+      <div class="stage">5. Brief<br><small>人工确认</small></div>
+      <div class="stage">6. DL 引用评分</div>
+      <div class="stage">7. AEO/GEO 优化</div>
+      <div class="stage gate">8. QA + Publish<br><small>人工确认</small></div>
+      <div class="stage">9. Monitor</div>
+    </div>
+    <div class="row" style="margin-bottom:8px">
+      <input id="wf-site" value="example.com" maxlength="200" placeholder="站点" aria-label="站点">
+      <input id="wf-topic" value="2026 深度 SEO 工作流" maxlength="100" placeholder="主题" aria-label="主题" style="flex:1">
+      <button onclick="run(this)">运行深度工作流</button>
+    </div>
+    <div id="wf-summary"></div>
+    <div class="log" id="log" aria-live="polite">点击「运行」开始，结果会显示在这里。</div>
+  </div>
+  <div class="card">
+    <h2>2026 关键洞察已融入</h2>
+    <div class="insight">• 深度学习引用评分：基于 Athena ACE 特征加权模型（阈值 0.73）</div>
+    <div class="insight">• 主题权威 = 支柱页 + 集群 + 强内部链接</div>
+    <div class="insight">• 实体 SEO：作者/组织 schema + sameAs + 外部提及</div>
+    <div class="insight">• E-E-A-T 重点：第一手 Experience + 可验证 Trust</div>
+    <div class="insight">• 高风险步骤强制人工闸门，避免规模化低价值内容</div>
+  </div>
+</div>
+<script>
+async function run(btn) {
+  const log = document.getElementById("log");
+  const stages = document.querySelectorAll(".stage");
+  stages.forEach(s => s.classList.remove("done"));
+  await SEO.withButton(btn, async () => {
+    SEO.loading(log, "17 个阶段执行中…", true);
+    try {
+      const data = await SEO.postJSON("/api/ai/seo-workflow", {
+        site: document.getElementById("wf-site").value,
+        topic: document.getElementById("wf-topic").value
+      });
+      const a = data.result || {};
+      document.getElementById("wf-summary").innerHTML = `
+        <div class="grid-3" style="margin-top:12px">
+          <div class="link-card"><strong>${SEO.escapeHtml(a.stages_completed)}/${SEO.escapeHtml(a.stages_total)}</strong><span class="muted">完成阶段</span></div>
+          <div class="link-card"><strong>${SEO.escapeHtml(a.citation_probability ?? "-")}（${SEO.escapeHtml(a.citation_grade ?? "-")}）</strong><span class="muted">DL 引用概率</span></div>
+          <div class="link-card"><strong>${SEO.escapeHtml(a.backlink_quality_score ?? "-")}</strong><span class="muted">外链质量分（阈值 0.70）</span></div>
+          <div class="link-card"><strong>${SEO.escapeHtml(a.human_gates ?? 0)}</strong><span class="muted">人工闸门</span></div>
+        </div>`;
+      SEO.done(log); log.textContent = JSON.stringify(data, null, 2);
+      SEO.toast(`旧版工作流已跑完 ${a.stages_completed}/${a.stages_total} 个阶段`, "ok");
+      stages.forEach(s => s.classList.add("done"));
+    } catch (e) {
+      SEO.failed(log, e, () => run(btn));
+    }
+  });
+}
+</script>
+{% endblock %}

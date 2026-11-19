@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}AI 管理中心{% endblock %}
+{% block heading %}AI 中心{% endblock %}
+{% block related %}<a href="/">看板</a><a href="/ai-react">ReAct</a><a href="/seo-path">SEO 路径</a>{% endblock %}
+{% block head %}<style>.ai-out { background: var(--surface); border: 1px dashed var(--border); border-radius: 8px; min-height: 64px; }
+.ai-out pre { margin: 0; background: none; }
+.ai-out .state { padding: 14px; }</style>{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>🧭 智能路由（Supervisor · 规则版）</h2>
+    <p class="muted">用一句话描述需求，Supervisor 按规则把它交给合适的专家 Agent（审计 / 学习路径 / 进度 / 导图 / 推荐 / 工作流）。接入 LLM 后可升级为语义路由。</p>
+    <form class="row" style="margin:8px 0" data-form="route">
+      <label class="sr-only" for="route-q">需求描述</label>
+      <input id="route-q" maxlength="300" value="帮我做一次 E-E-A-T 信任审计" required style="flex:1;min-width:200px">
+      <button type="submit">路由并执行</button>
+    </form>
+    <div class="ai-out" id="route" aria-live="polite"></div>
+  </div>
+  <div class="card">
+    <h2>进度分析</h2>
+    <p class="muted">基于学习看板中的真实任务数据，由 ProgressAnalyzer Agent 生成分析与建议。</p>
+    <div class="row" style="margin:8px 0"><button type="button" onclick="run(this,'/api/ai/analyze','analyze')">分析</button><a href="/ai-react">查看 ReAct 推理轨迹 ›</a></div>
+    <div class="ai-out" id="analyze" aria-live="polite"></div>
+  </div>
+  <div class="card">
+    <h2>思维导图</h2>
+    <form class="row" style="margin-bottom:8px" data-form="mindmap">
+      <label class="sr-only" for="topic">导图主题</label>
+      <input id="topic" placeholder="主题，例如：SEO 基础" value="SEO 基础" maxlength="50" required style="flex:1;min-width:160px">
+      <button type="submit">生成</button>
+    </form>
+    <div class="ai-out" id="mindmap" aria-live="polite"></div>
+  </div>
+  <div class="card">
+    <h2>推荐</h2>
+    <div class="row" style="margin-bottom:8px" role="group" aria-label="推荐场景">
+      <button type="button" class="btn-secondary" onclick="rec(this,'general')">通用</button>
+      <button type="button" class="btn-secondary" onclick="rec(this,'complex')">复杂</button>
+      <button type="button" class="btn-secondary" onclick="rec(this,'planning')">规划</button>
+    </div>
+    <div class="ai-out" id="recommend" aria-live="polite"></div>
+  </div>
+</div>
+<script>
+const HINT = {route: "输入需求后点「路由并执行」，结果显示在这里", analyze: "点「分析」读取看板任务并生成建议",
+              mindmap: "输入主题后点「生成」", recommend: "选择一个场景获取可视化方案推荐"};
+Object.entries(HINT).forEach(([id, hint]) => SEO.empty(id, "还没有结果", hint, "💬"));
+function out(id, data) { document.getElementById(id).innerHTML = `<pre>${SEO.escapeHtml(JSON.stringify(data, null, 2))}</pre>`; }
+async function call(btn, id, url, body) {
+  SEO.loading(id, "Agent 正在处理…", true);
+  await SEO.withButton(btn, async () => {
+    try { out(id, await SEO.postJSON(url, body)); SEO.done(id); }
+    catch (e) { SEO.failed(id, e, () => call(btn, id, url, body)); }
+  });
+}
+function run(btn, url, id) { return call(btn, id, url, {}); }
+document.querySelector('[data-form="mindmap"]').addEventListener("submit", ev => {
+  ev.preventDefault();
+  call(ev.target.querySelector("button"), "mindmap", "/api/ai/mindmap", {topic: document.getElementById("topic").value.trim()});
+});
+document.querySelector('[data-form="route"]').addEventListener("submit", ev => {
+  ev.preventDefault();
+  call(ev.target.querySelector("button"), "route", "/api/ai/route", {request: document.getElementById("route-q").value.trim()});
+});
+function rec(btn, context) { return call(btn, "recommend", "/api/ai/recommend", {context}); }
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}分布式一致性协议{% endblock %}
+{% block heading %}分布式一致性协议{% endblock %}
+{% block related %}<a href="/cache-strategy">缓存策略</a><a href="/multi-agent">Agent架构</a><a href="/seo-workflow">工作流</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.model { border-left: 4px solid #4f46e5; padding: 10px 14px; margin: 8px 0; background: var(--surface); }
+.model strong { color: var(--text); }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.box { background: var(--surface-2); border-radius: 8px; padding: 12px; font-size: 14px; }
+.tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 12px; margin-right: 6px; }
+.strong { background: var(--tint-green); color: var(--ink-green); }
+.eventual { background: var(--tint-amber); color: var(--ink-amber); }
+.raft { background: var(--tint-blue); color: var(--ink-blue); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>一致性模型谱系</h2>
+    <div class="model">
+      <strong>线性一致性（Linearizability）</strong> — 最强。所有操作看起来像在单一原子时间点执行，实时可见。适合配置与关键状态。
+    </div>
+    <div class="model">
+      <strong>顺序一致性（Sequential）</strong> — 所有节点看到相同操作顺序，但不保证实时。
+    </div>
+    <div class="model">
+      <strong>因果一致性（Causal）</strong> — 因果相关的操作保持顺序，无关操作可乱序。
+    </div>
+    <div class="model">
+      <strong>最终一致性（Eventual）</strong> — 最终所有副本收敛，期间可能短暂不一致。高可用优先。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>CAP 与 PACELC</h2>
+    <div class="compare">
+      <div class="box">
+        <strong>CAP（分区时）</strong><br>
+        网络分区时必须在一致性（C）与可用性（A）之间选择。分区容忍（P）是分布式系统的基本要求。
+      </div>
+      <div class="box">
+        <strong>PACELC（日常）</strong><br>
+        无分区时（正常运行），在延迟（L）与一致性（C）之间权衡。这才是大部分时间的实际权衡。
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>共识协议：Raft vs Paxos</h2>
+    <div class="compare">
+      <div class="box">
+        <span class="tag raft">Raft</span><br>
+        强领导者、日志顺序提交、成员变更明确规范。易理解、易实现。生产系统：etcd、Consul、CockroachDB、Kubernetes。
+      </div>
+      <div class="box">
+        <span class="tag">Multi-Paxos</span><br>
+        理论更灵活，但规范不完整。实现难度高。Google Chubby、Spanner 等大规模系统使用变体。
+      </div>
+    </div>
+    <p class="muted" style="margin-top:10px;">Raft 在稳定领导者下单轮提交；选举时多一轮。Paxos 在多提议者场景下可能产生干扰。</p>
+  </div>
+
+  <div class="card">
+    <h2>与本系统的关联</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>当前缓存</strong>：进程内 TTL = 最终一致性（单进程内强一致）。</li>
+      <li><strong>多实例扩展</strong>：引入 Redis 共享层时，需明确选择最终一致性（高可用）或通过版本戳接近强一致。</li>
+      <li><strong>Agent 协调</strong>：关键状态（人工闸门确认、任务分配）建议强一致；中间计算结果可最终一致。</li>
+      <li><strong>失效广播</strong>：Pub/Sub 事件驱动失效接近因果一致性；纯 TTL 为最终一致性。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>实践建议</h2>
+    <p class="muted">对 SEO 自动化系统：引用评分与审计结果可用最终一致性（接受短暂延迟）；人工确认与发布闸门需要更强一致性。选择 Raft 风格协调服务（如 etcd）管理关键配置与任务状态，可获得可理解且可靠的强一致保证。</p>
+  </div>
+</div>
+{% endblock %}

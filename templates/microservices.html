@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}微服务架构模式{% endblock %}
+{% block heading %}微服务架构模式{% endblock %}
+{% block related %}<a href="/overview">总览</a><a href="/multi-agent">Agent协作</a><a href="/cache-strategy">缓存</a><a href="/consistency">一致性</a><a href="/">看板</a>{% endblock %}
+{% block head %}
+<style>
+.pattern { border-left: 4px solid #4f46e5; padding: 10px 14px; margin: 8px 0; background: var(--surface); border-radius: 0 8px 8px 0; }
+.pattern h3 { margin: 0 0 4px; font-size: 15px; }
+.grid-patterns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.box { background: var(--surface-2); border-radius: 8px; padding: 12px; font-size: 14px; }
+.tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 12px; margin-right: 6px; background: var(--tint-indigo); color: var(--ink-indigo); }
+.resilience { color: var(--ok); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <h2>核心模式</h2>
+    <div class="pattern">
+      <h3>API Gateway / 后端聚合</h3>
+      单一入口，负责路由、认证、限流与响应聚合。对应本系统的 Coordinator 调度层。
+    </div>
+    <div class="pattern">
+      <h3>Database per Service</h3>
+      每个服务拥有自己的数据存储，避免共享数据库耦合。Agent 中间结果与任务状态应隔离。
+    </div>
+    <div class="pattern">
+      <h3>Saga（分布式事务）</h3>
+      跨服务业务流程由本地事务序列 + 补偿操作组成。编排式（Orchestration）由中央协调器驱动；编舞式（Choreography）由事件驱动。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>弹性模式</h2>
+    <div class="grid-patterns">
+      <div class="box">
+        <span class="tag resilience">Circuit Breaker</span><br>
+        失败阈值触发后快速失败，避免级联。状态：Closed → Open → Half-Open。
+      </div>
+      <div class="box">
+        <span class="tag resilience">Retry + Backoff</span><br>
+        对暂时性失败重试，带指数退避与抖动，防止重试风暴。
+      </div>
+      <div class="box">
+        <span class="tag resilience">Bulkhead</span><br>
+        隔离资源池（线程、连接），防止单一依赖耗尽系统资源。
+      </div>
+      <div class="box">
+        <span class="tag resilience">Timeout</span><br>
+        所有跨服务调用必须设置超时，防止慢调用占用资源。
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>与多智能体系统的映射</h2>
+    <ul style="font-size:14px; padding-left:18px; line-height:1.8;">
+      <li><strong>Coordinator</strong> ≈ API Gateway + 编排器：接收请求、分发任务、聚合结果。</li>
+      <li><strong>专用 Agent</strong> ≈ 微服务：各自负责边界清晰的能力（SEO 路径、EEAT 审计、引用评分）。</li>
+      <li><strong>ReAct 循环</strong> ≈ Saga：多步骤推理，失败时可通过轨迹回退或重试。</li>
+      <li><strong>共享状态 / 事件</strong> ≈ 编舞式：Agent 通过结果缓存与事件触发后续步骤。</li>
+      <li><strong>风险缓解</strong>：当前系统已有步骤预算与重复动作检测；扩展时需加入超时、熔断与隔离。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>实践建议</h2>
+    <p class="muted">对 SEO 自动化系统：保持 Coordinator 作为编排中枢（可调试），专用 Agent 保持单一职责。关键路径（人工闸门确认）使用强一致协调；中间计算结果可最终一致。扩展多实例时优先引入超时与熔断，避免单 Agent 失败拖垮整个工作流。</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}全部页面{% endblock %}
+{% block heading %}🗂️ 全部页面（{{ page_count }}）{% endblock %}
+{% block related %}<a href="/dashboard">仪表盘</a><a href="/">看板</a><a href="/mobile">手机版</a>{% endblock %}
+{% block content %}
+<div class="container">
+  {% for group, items in nav_groups.items() %}
+  <div class="card">
+    <h2>{{ group }} <span class="muted">· {{ items|length }} 页</span></h2>
+    <div class="grid-3">
+      {% for p in items %}<a class="link-card" href="{{ p.path }}"><strong>{{ p.title }}</strong><span class="muted">{{ p.path }}</span></a>{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
